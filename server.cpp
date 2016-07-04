@@ -4,6 +4,8 @@
 
 #include "server.h"
 
+#include <sys/sysinfo.h>
+
 server::server()
     : m_stop_flag(true),
       m_thread_poll(2) {
@@ -24,6 +26,7 @@ void server::stop() {
 }
 
 int server::init() {
+    int cpu_count = ::get_nprocs();
     return 0;
 }
 
