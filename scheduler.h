@@ -33,6 +33,10 @@ public:
 
     void spawn(task_type_ptr& task);
 
+    ev_loop* event_loop() {
+        return m_loop.get();
+    }
+
 
 private:
     static void ev_io_call_back(ev_loop*, ev_io*, int);

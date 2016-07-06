@@ -2,13 +2,11 @@
 // Created by weitao on 7/4/16.
 //
 
-#ifndef SNOW_LIBEV_SERVER_H
-#define SNOW_LIBEV_SERVER_H
-
+#pragma once
 
 #include <cstdint>
 #include <vector>
-#include "proxy.hpp"
+#include <ev.h>
 #include "thread_poll.hpp"
 #include "buffer.h"
 #include "acceptor.h"
@@ -34,6 +32,11 @@ namespace snow
 
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
+    private:
+        static void check(ev_loop* loop, ev_check* watcher, int revents);
+
+        static void prepare(ev_loop* loop, ev_prepare* watcher, int revents);
+
 
     private:
         server(const server&) = delete;
@@ -50,5 +53,3 @@ namespace snow
     };
 }
 
-
-#endif //SNOW_LIBEV_SERVER_H

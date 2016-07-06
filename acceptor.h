@@ -37,6 +37,12 @@ public:
 
     void set_new_connection_handle(new_connection_handle_type& handle);
 
+    bool try_lock();
+
+    void unlock();
+
+    void enable_event_call_back();
+
 private:
     static void handle_read(ev_loop* loop, ev_io* io_watcher, int revents);
 

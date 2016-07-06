@@ -8,6 +8,7 @@
 #include <cassert>
 #include <cstring>
 #include <ev.h>
+#include "scheduler.h"
 
 acceptor::acceptor()
   : acceptor("", 0) {
@@ -83,6 +84,19 @@ void acceptor::handle_new_connection() {
 
 void acceptor::set_new_connection_handle(new_connection_handle_type &handle) {
     m_new_connection_handle = handle;
+}
+
+bool acceptor::try_lock() {
+    return m_mutex.try_lock();
+}
+
+void acceptor::unlock() {
+    m_mutex.unlock();
+}
+
+void acceptor::enable_event_call_back() {
+    ev_io_init(m_io_watcher.get(), &acceptor::handle_read, m_socket_fd, EV_READ);
+    ev_io_start(scheduler::instance().event_loop(), m_io_watcher.get());
 }
 
 void acceptor::handle_read(ev_loop *loop, ev_io *io_watcher, int revents) {
