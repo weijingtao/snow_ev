@@ -8,7 +8,7 @@
 
 namespace snow
 {
-    log_obj::log_obj(log_writer_type &log_writer)
+    log_obj::log_obj(log_writer_type log_writer)
         : m_log_writer(std::move(log_writer)){
 
     }
@@ -23,18 +23,19 @@ namespace snow
         m_log_writer(m_buffer.str());
     }
 
-    template <typename T>
-    log_obj& log_obj<T>::operator=(const T& value) {
+    /*template <typename T>
+    log_obj& log_obj::operator=(const T& value) {
         m_buffer << value;
         return *this;
-    }
+    }*/
 
     logger& logger::instance() {
         static logger log_instance;
         return log_instance;
     }
 
-    logger::logger() {
+    logger::logger()
+        : m_log_writer(default_log_writer()) {
 
     }
 
@@ -63,6 +64,18 @@ namespace snow
     }
 
     void logger::write(log_level level, const std::string &str) {
-        std::cout << "level[" << reinterpret_cast<int>(level) << "] " << str << std::endl;
+        std::stringstream log_message;
+        log_message << "level[" << int(level) << "] " << str << std::endl;
+        m_log_writer(log_message.str());
+    }
+
+    logger::default_log_writer::default_log_writer(default_log_writer &&rhs) {
+        using std::swap;
+        swap(m_mutex, rhs.m_mutex);
+    }
+
+    void logger::default_log_writer::operator()(const std::string &str) {
+        std::lock_guard<std::mutex> lock_guard(m_mutex);
+        std::cout << str;
     }
 }

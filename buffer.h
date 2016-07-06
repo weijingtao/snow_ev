@@ -10,7 +10,7 @@
 
 #include <cassert>
 #include <memory>
-#include "log.hpp"
+#include "logger.h"
 
 namespace snow
 {

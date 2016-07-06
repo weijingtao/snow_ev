@@ -2,8 +2,7 @@
 // Created by weitao on 7/1/16.
 //
 
-#ifndef SNOW_LIBEV_SCHEDULER_H
-#define SNOW_LIBEV_SCHEDULER_H
+#pragma once
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -12,46 +11,48 @@
 #include <deque>
 #include <ev.h>
 
-class task;
-class scheduler
-{
-public:
-    typedef std::function<void()>      task_type;
-    typedef std::unique_ptr<task_type> task_type_ptr;
+namespace snow {
+    class task;
 
-    static scheduler& instance();
+    class scheduler {
+    public:
+        typedef std::function<void()> task_type;
+        typedef std::unique_ptr<task_type> task_type_ptr;
 
-    scheduler();
+        static scheduler &instance();
 
-    void init();
+        scheduler();
 
-    void start();
+        void init();
 
-    void stop();
+        void start();
 
-    void post(task_type_ptr& task);
+        void stop();
 
-    void spawn(task_type_ptr& task);
+        void post(task_type_ptr &task);
 
-    ev_loop* event_loop() {
-        return m_loop.get();
-    }
+        void spawn(task_type_ptr &task);
 
-
-private:
-    static void ev_io_call_back(ev_loop*, ev_io*, int);
-
-    static void ev_timer_call_back(ev_loop, ev_timer*);
-
-    void run();
-
-private:
-    std::unique_ptr<ev_loop>               m_loop;
-    std::unique_ptr<ev_io>                 m_io_watcher;
-    std::deque<std::unique_ptr<task_type>> m_task_queue;
-    int                                    m_socket_pair[2];
-    bool                                   m_running;
-};
+        struct ev_loop *event_loop() {
+            return m_loop.get();
+        }
 
 
-#endif //SNOW_LIBEV_SCHEDULER_H
+    private:
+        static void ev_io_call_back(struct ev_loop *, ev_io *, int);
+
+        static void ev_timer_call_back(struct ev_loop *, ev_timer *);
+
+        void wake_up();
+
+        void run();
+
+    private:
+        std::unique_ptr<struct ev_loop> m_loop;
+        std::unique_ptr<ev_io> m_io_watcher;
+        std::deque<std::unique_ptr<task_type>> m_task_queue;
+        int m_socket_pair[2];
+        bool m_running;
+    };
+
+}

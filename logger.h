@@ -34,7 +34,15 @@ namespace snow
         ~log_obj();
 
         template <typename T>
-        log_obj& operator=(const T& value);
+        log_obj& operator=(const T& value) {
+            m_buffer << value;
+            return *this;
+        }
+
+        log_obj& operator=(const char* const value) {
+            m_buffer << value;
+            return *this;
+        }
 
     private:
         log_obj(const log_obj&) = delete;
@@ -49,7 +57,7 @@ namespace snow
     class logger
     {
     public:
-        typedef std::function<void(const std::string&)> log_call_back_type;
+        typedef std::function<void(const std::string&)> log_writer_type;
 
         static logger& instance();
 
@@ -76,7 +84,26 @@ namespace snow
         void write(log_level level, const std::string& str);
 
     private:
-        log_call_back_type m_log_cb;
+        class default_log_writer
+        {
+        public:
+            default_log_writer() = default;
+
+            default_log_writer(default_log_writer&& rhs);
+
+            void operator()(const std::string& str);
+
+        private:
+            default_log_writer(const default_log_writer&) = delete;
+            void operator=(const default_log_writer&) = delete;
+
+
+        private:
+            std::mutex m_mutex;
+        };
+
+    private:
+        log_writer_type m_log_writer;
     };
 
 }
