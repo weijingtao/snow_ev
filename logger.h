@@ -1,0 +1,89 @@
+//
+// Created by weitao on 7/6/16.
+//
+
+#pragma once
+
+#include <functional>
+#include <mutex>
+#include <string>
+#include <sstream>
+#include <ostream>
+
+namespace snow
+{
+    enum class log_level
+    {
+        TRACE   = 0,
+        DEBUG   = 1,
+        INFO    = 3,
+        WARNING = 4,
+        ERROR   = 5,
+        FATAL   = 6
+    };
+
+    class log_obj
+    {
+    public:
+        typedef std::function<void(const std::string&)> log_writer_type;
+
+        explicit log_obj(log_writer_type log_writer);
+
+        log_obj(log_obj&& rhs);
+
+        ~log_obj();
+
+        template <typename T>
+        log_obj& operator=(const T& value);
+
+    private:
+        log_obj(const log_obj&) = delete;
+        void operator=(const log_obj&) = delete;
+        void operator=(const log_obj&&) = delete;
+
+    private:
+        log_writer_type   m_log_writer;
+        std::stringstream m_buffer;
+    };
+
+    class logger
+    {
+    public:
+        typedef std::function<void(const std::string&)> log_call_back_type;
+
+        static logger& instance();
+
+        logger();
+
+        log_obj trace() const;
+
+        log_obj debug() const;
+
+        log_obj info() const;
+
+        log_obj warning() const;
+
+        log_obj error() const;
+
+        log_obj fatal() const;
+
+    private:
+        logger(const logger&) = delete;
+        logger(logger&&) = delete;
+        void operator=(const logger&) = delete;
+        void operator=(logger&&) = delete;
+
+        void write(log_level level, const std::string& str);
+
+    private:
+        log_call_back_type m_log_cb;
+    };
+
+}
+
+#define SNOW_LOG_TRACE   snow::logger::instance().trace()
+#define SNOW_LOG_DEBUG   snow::logger::instance().debug()
+#define SNOW_LOG_INFO    snow::logger::instance().info()
+#define SNOW_LOG_WARNING snow::logger::instance().warning()
+#define SNOW_LOG_ERROR   snow::logger::instance().error()
+#define SNOW_LOG_FATAL   snow::logger::instance().fatal()
