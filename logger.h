@@ -39,6 +39,7 @@ namespace snow
             return *this;
         }
 
+        template <char>
         log_obj& operator=(const char* const value) {
             m_buffer << value;
             return *this;
