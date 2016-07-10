@@ -9,8 +9,8 @@
 
 namespace snow
 {
-    timer_fd::timer_fd(poller& poller1)
-        : m_event(&poller1),
+    timer_fd::timer_fd(std::shared_ptr<poller>& poller1)
+        : m_event(poller1),
           m_fd(-1) {
 
     }

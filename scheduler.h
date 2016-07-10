@@ -33,8 +33,8 @@ namespace snow {
 
         void spawn(task_type_ptr &task);
 
-        poller& get_poller() {
-            return  *(m_poller.get());
+        std::shared_ptr<poller> get_poller() {
+            return  m_poller;
         }
 
         void set_call_back_before_loop(call_back_before_loop_type cb) {
@@ -53,7 +53,7 @@ namespace snow {
         void run();
 
     private:
-        std::unique_ptr<poller>      m_poller;
+        std::shared_ptr<poller>      m_poller;
         std::unique_ptr<timer_queue> m_timer_queue;
         std::unique_ptr<awakener>    m_awakener;
         call_back_before_loop_type   m_cb_before_loop;

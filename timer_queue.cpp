@@ -10,7 +10,7 @@
 
 namespace snow
 {
-    timer_queue::timer_queue(poller& poller)
+    timer_queue::timer_queue(std::shared_ptr<poller>& poller)
       : m_timer_fd(poller) {
         m_timer_fd.init();
         m_timer_fd.set_timeout_cb(std::bind(&timer_queue::handle_timeout, this));

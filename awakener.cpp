@@ -11,8 +11,8 @@
 
 namespace snow
 {
-    awakener::awakener(poller &poller1)
-      : m_event{&poller1},
+    awakener::awakener(std::shared_ptr<poller> &poller1)
+      : m_event{poller1},
         m_socket_pair{-1, -1} {
         if (0 == ::socketpair(AF_LOCAL, ::SOCK_DGRAM, 0, m_socket_pair)) {
             ::shutdown(m_socket_pair[0], ::SHUT_RD);

@@ -28,7 +28,7 @@ namespace snow
         typedef std::set<entry>                               timer_set;
 
 
-        explicit timer_queue(poller& poller);
+        explicit timer_queue(std::shared_ptr<poller>& poller);
 
         timer_id add_timer(timer_call_back& cb,
                            time_stamp when,

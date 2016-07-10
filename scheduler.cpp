@@ -19,8 +19,8 @@ namespace snow {
 
     scheduler::scheduler()
         : m_poller(new poller),
-          m_timer_queue(new timer_queue(*m_poller.get())),
-          m_awakener(new awakener(*m_poller.get())) {
+          m_timer_queue(new timer_queue(m_poller)),
+          m_awakener(new awakener(m_poller)) {
 
     }
 

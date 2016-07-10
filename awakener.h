@@ -13,7 +13,7 @@ namespace snow
     class awakener
     {
     public:
-        explicit awakener(poller& poller1);
+        explicit awakener(std::shared_ptr<poller>& poller1);
 
         ~awakener();
 

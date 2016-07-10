@@ -27,7 +27,7 @@ namespace snow
         typedef std::function<void(int)>  error_handle_type;
         typedef std::list<std::shared_ptr<event>>::const_iterator index_type;
 
-        explicit event(poller*  poller1)
+        explicit event(std::shared_ptr<poller>& poller1)
           : m_poller(poller1),
             m_socket_fd(-1),
             m_mask(EV_NONE),
@@ -36,15 +36,21 @@ namespace snow
         }
 
         event()
-          : event(nullptr) {
+          : m_socket_fd(-1),
+            m_mask(EV_NONE),
+            m_ready_mask(EV_NONE) {
 
         }
 
 
         void run();
 
-        void set_poller(poller* poller1) {
+        void set_poller(std::shared_ptr<poller>& poller1) {
             m_poller = poller1;
+        }
+
+        void set_poller(std::shared_ptr<poller>&& poller1) {
+            m_poller = std::move(poller1);
         }
 
         void set_read_cb(event_handle_type&& cb) {
@@ -155,13 +161,13 @@ namespace snow
         }
 
     private:
-        poller*  m_poller;
-        event_handle_type m_read_cb;
-        event_handle_type m_write_cb;
-        error_handle_type m_error_cb;
-        index_type        m_index;
-        int32_t  m_socket_fd;
-        uint16_t m_mask;
-        uint16_t m_ready_mask;
+        std::weak_ptr<poller> m_poller;
+        event_handle_type     m_read_cb;
+        event_handle_type     m_write_cb;
+        error_handle_type     m_error_cb;
+        index_type            m_index;
+        int32_t               m_socket_fd;
+        uint16_t              m_mask;
+        uint16_t              m_ready_mask;
     };
 }

@@ -18,7 +18,7 @@ namespace snow
         typedef std::chrono::steady_clock::time_point time_stamp;
         typedef std::function<void(void)> time_out_cb;
 
-        timer_fd(poller& poller1);
+        timer_fd(std::shared_ptr<poller>& poller1);
 
         ~timer_fd();
 
