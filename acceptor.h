@@ -23,15 +23,9 @@ namespace snow {
 
         acceptor(const std::string &ip, uint16_t port);
 
-//        acceptor(acceptor &&rhs);
-
         ~acceptor();
 
-//        void operator=(acceptor &&rhs);
-
         int init();
-
-        void handle_new_connection();
 
         void set_new_connection_handle(new_connection_handle_type &handle);
 
@@ -46,8 +40,6 @@ namespace snow {
         void operator=(const acceptor &) = delete;
 
         void handle_read();
-
-//        void swap(acceptor &rhs);
 
     private:
         std::unique_ptr<event> m_event;

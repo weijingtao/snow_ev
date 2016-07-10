@@ -20,27 +20,16 @@ namespace snow {
     }
 
     acceptor::acceptor(const std::string &ip, uint16_t port)
-        : /*m_event(new event()),*/
+        : m_event(new event),
           m_ip(ip),
           m_port(0),
           m_socket_fd(-1) {
     }
 
-    /*acceptor::acceptor(acceptor &&rhs)
-        : acceptor() {
-        swap(rhs);
-    }*/
-
     acceptor::~acceptor() {
         ::close(m_socket_fd);
         m_socket_fd = -1;
     }
-
-    /*void acceptor::operator=(acceptor &&rhs) {
-        acceptor temp;
-        swap(temp);
-        swap(rhs);
-    }*/
 
     int acceptor::init() {
         struct sockaddr_in bind_addr = {0};
@@ -66,25 +55,6 @@ namespace snow {
         return 0;
     }
 
-    void acceptor::handle_new_connection() {
-        int client_fd = 0;
-        socklen_t addr_len = 0;
-        struct sockaddr peer_addr = {0};
-        do {
-            client_fd = ::accept4(m_socket_fd, &peer_addr, &addr_len, ::SOCK_CLOEXEC | ::SOCK_NONBLOCK);
-            if (client_fd > 0) {
-                m_new_connection_handle(client_fd, peer_addr, addr_len);
-            } else {
-                if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
-                    break;
-                }
-                if (errno == EINTR) {
-                    continue;
-                }
-            }
-        } while (true);
-    }
-
     void acceptor::set_new_connection_handle(new_connection_handle_type &handle) {
         m_new_connection_handle = handle;
     }
@@ -98,18 +68,29 @@ namespace snow {
     }
 
     void acceptor::enable_event_call_back() {
+        m_event->set_poller(&scheduler::instance().get_poller());
+        m_event->set_read_cb(std::bind(&acceptor::handle_read, this));
+        m_event->enable_reading();
+        m_event->enable_oneshot();
     }
 
     void acceptor::handle_read() {
+        int client_fd = 0;
+        socklen_t addr_len = 0;
+        struct sockaddr peer_addr = {0};
+        do {
+            client_fd = ::accept4(m_socket_fd, &peer_addr, &addr_len, ::SOCK_CLOEXEC | ::SOCK_NONBLOCK);
+            if (client_fd > 0) {
+                if(m_new_connection_handle)
+                    m_new_connection_handle(client_fd, peer_addr, addr_len);
+            } else {
+                if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+                    break;
+                }
+                if (errno == EINTR) {
+                    continue;
+                }
+            }
+        } while (true);
     }
-
-    /*void acceptor::swap(acceptor &rhs) {
-        using std::swap;
-        swap(m_event, rhs.m_event);
-        swap(m_ip, rhs.m_ip);
-        swap(m_port, rhs.m_port);
-        swap(m_new_connection_handle, rhs.m_new_connection_handle);
-        swap(m_mutex, rhs.m_mutex);
-        swap(m_socket_fd, rhs.m_socket_fd);
-    }*/
 }
