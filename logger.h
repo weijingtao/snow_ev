@@ -51,7 +51,7 @@ namespace snow
 
     private:
         log_writer_type   m_log_writer;
-        std::stringstream m_buffer;
+        mutable std::stringstream m_buffer;
     };
 
     class logger

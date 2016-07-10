@@ -20,7 +20,7 @@ namespace snow
               m_size(init_size),
               m_read_index(0),
               m_write_index(0) {
-            SNOW_LOG_TRACE << "buffer construct" ;//<< std::endl;
+            SNOW_LOG_TRACE << "buffer construct\n";
         }
 
         //TODO
@@ -32,11 +32,11 @@ namespace snow
             rhs.m_size        = 0;
             rhs.m_read_index  = 0;
             rhs.m_write_index = 0;
-            SNOW_LOG_TRACE << "buffer move construct";// << std::endl;
+            SNOW_LOG_TRACE << "buffer move construct\n";
         }
 
         ~buffer() {
-            SNOW_LOG_TRACE << "buffer destruct";// << std::endl;
+            SNOW_LOG_TRACE << "buffer destruct\n";
         }
 
         std::size_t readable_bytes() const {

@@ -36,20 +36,20 @@ namespace snow {
         bind_addr.sin_family = AF_INET;
         bind_addr.sin_port = ::htons(m_port);
         if (::inet_pton(AF_INET, m_ip.c_str(), &bind_addr.sin_addr) < 0) {
-//            SNOW_LOG_FATAL << "errno[" << ::errno << "]: " << strerror(::errno);
+            SNOW_LOG_FATAL << "errno[" << errno << "]: " << strerror(errno);
             return -1;
         }
         m_socket_fd = ::socket(AF_INET, SOCK_STREAM, 0);
         if (m_socket_fd < 0) {
-//            perror("errno[%d]:%s", ::errno, strerror(::errno));
+            SNOW_LOG_FATAL << "errno[" << errno << "]: " << strerror(errno);
             return -1;
         }
         if (::bind(m_socket_fd, reinterpret_cast<sockaddr*>(&bind_addr), sizeof(bind_addr)) < 0) {
-//            perror("errno[%d]:%s", ::errno, strerror(::errno));
+            SNOW_LOG_FATAL << "errno[" << errno << "]: " << strerror(errno);
             return -1;
         }
         if (::listen(m_socket_fd, 10) < 0) {
-//            perror("errno[%d]:%s", ::errno, strerror(::errno));
+            SNOW_LOG_FATAL << "errno[" << errno << "]: " << strerror(errno);
             return -1;
         }
         return 0;
