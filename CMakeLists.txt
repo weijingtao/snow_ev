@@ -13,5 +13,6 @@ set(SOURCE_FILES
         poller.cpp
         timer_fd.cpp
         timer.cpp
-        timer_queue.cpp)
+        timer_queue.cpp
+        awakener.cpp)
 add_executable(snow_libev ${SOURCE_FILES})

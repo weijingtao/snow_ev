@@ -8,6 +8,7 @@
 #include <cassert>
 #include <thread>
 #include <array>
+#include "event.h"
 
 namespace snow {
 
@@ -18,37 +19,13 @@ namespace snow {
 
     scheduler::scheduler()
         : m_poller(new poller),
-          m_timer_queue(new timer_queue(*m_poller.get())) {
+          m_timer_queue(new timer_queue(*m_poller.get())),
+          m_awakener(new awakener(*m_poller.get())) {
 
-    }
-
-    void scheduler::init() {
-        if (0 == ::socketpair(AF_LOCAL, ::SOCK_DGRAM, 0, m_socket_pair)) {
-            ev_io_init(m_io_watcher.get(), scheduler::ev_io_call_back, m_socket_pair[1], EV_READ);
-            m_io_watcher->data = static_cast<void *>(this);
-            ev_io_start(m_loop.get(), m_io_watcher.get());
-        }
-    }
-
-    void scheduler::ev_io_call_back(struct ev_loop *loop, ev_io *io_watcher, int revents) {
-        assert(nullptr != io_watcher->data);
-        static_cast<scheduler *>(io_watcher->data)->wake_up();
-    }
-
-    void scheduler::ev_timer_call_back(struct ev_loop *loop, ev_timer *watcher) {
-        assert(nullptr != watcher->data);
     }
 
     void scheduler::wake_up() {
-        std::array<char, 32> buffer;
-        std::size_t n_read = 0;
-        while ((n_read = ::read(m_socket_pair[1], buffer.data(), buffer.size())) > 0);
-        while (!m_task_queue.empty()) {
-            task_type_ptr task = std::move(m_task_queue.front());
-            (*task)();
-            m_task_queue.pop_front();
-        }
-
+        m_awakener->wake_up();
     }
 
     void scheduler::start() {
@@ -66,7 +43,7 @@ namespace snow {
 
     void scheduler::post(task_type_ptr &task) {
         m_task_queue.push_back(task);
-        ::write(m_socket_pair[0], "#", 1);
+        wake_up();
     }
 
     void scheduler::spawn(task_type_ptr &task) {
@@ -76,7 +53,15 @@ namespace snow {
 
     void scheduler::run() {
         while (m_running) {
-            ev_run(m_loop.get(), 0);
+            if(m_cb_before_loop)
+                m_cb_before_loop();
+            std::vector<std::shared_ptr<event>> active_events;
+            m_poller->poll(&active_events, 10);
+            for (auto& event : active_events) {
+                event->run();
+            }
+            if(m_cb_after_loop)
+                m_cb_after_loop();
         }
     }
 }

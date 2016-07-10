@@ -13,13 +13,16 @@ namespace snow
     class awakener
     {
     public:
-        awakener(poller& poller1);
+        explicit awakener(poller& poller1);
 
         ~awakener();
 
         void wake_up();
 
     private:
+        awakener(const awakener&) = delete;
+        void operator=(const awakener&) = delete;
+
         void handle_read();
 
     private:

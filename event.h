@@ -27,13 +27,15 @@ namespace snow
         typedef std::function<void(int)>  error_handle_type;
         typedef std::list<std::shared_ptr<event>>::const_iterator index_type;
 
-        event(poller&  poller)
-          : m_poller(poller),
+        explicit event(poller&  poller1)
+          : m_poller(poller1),
             m_socket_fd(-1),
             m_mask(EV_NONE),
             m_ready_mask(EV_NONE) {
 
         }
+
+        void run();
 
         void set_read_cb(event_handle_type&& cb) {
             m_read_cb = std::move(cb);
@@ -115,6 +117,14 @@ namespace snow
 
         bool is_oneshot() const {
             return m_mask & EV_ONESHOT;
+        }
+
+        bool is_readable() const {
+            return m_ready_mask & EV_READ;
+        }
+
+        bool is_writeable() const {
+            return m_ready_mask & EV_WRITE;
         }
 
         bool is_none_event() const {

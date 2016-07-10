@@ -23,15 +23,22 @@ namespace snow
         }
     }
 
+    awakener::~awakener() {
+        m_event.disable_all();
+        ::close(m_socket_pair[0]);
+        m_socket_pair[0] = -1;
+        ::close(m_socket_pair[1]);
+        m_socket_pair[1] = -1;
+    }
+
+    void awakener::wake_up() {
+        while(::write(m_socket_pair[0], "#", 1) < 0);
+    }
+
 
     void awakener::handle_read() {
         std::array<char, 32> buffer;
         std::size_t n_read = 0;
         while ((n_read = ::read(m_socket_pair[1], buffer.data(), buffer.size())) > 0);
-        while (!m_task_queue.empty()) {
-            task_type_ptr task = std::move(m_task_queue.front());
-            (*task)();
-            m_task_queue.pop_front();
-        }
     }
 }

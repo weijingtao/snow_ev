@@ -26,7 +26,7 @@ namespace snow
         typedef std::shared_ptr<timer>                timer_id;
 
 
-        timer_queue(poller& poller);
+        explicit timer_queue(poller& poller);
 
         timer_id add_timer(timer_call_back& cb,
                            time_stamp when,
