@@ -24,6 +24,8 @@ namespace snow
         typedef std::chrono::steady_clock::time_point time_stamp;
         typedef std::function<void()>                 timer_call_back;
         typedef std::shared_ptr<timer>                timer_id;
+        typedef std::pair<time_stamp, std::shared_ptr<timer>> entry;
+        typedef std::set<entry>                               timer_set;
 
 
         explicit timer_queue(poller& poller);
@@ -41,15 +43,14 @@ namespace snow
 
 
     private:
-        typedef std::pair<time_stamp, std::shared_ptr<timer>> entry;
-        typedef std::set<entry>                               timer_set;
+
 
         void handle_timeout();
 
         // move out all expired timers
         std::vector<entry> get_expired(const time_stamp& now);
 
-        void reset(const std::vector<entry>& expired, const time_stamp& now);
+        void reset(std::vector<entry>& expired, const time_stamp& now);
 
         bool insert(std::shared_ptr<timer>& timer);
 

@@ -24,9 +24,8 @@ namespace snow
     timer_queue::timer_id timer_queue::add_timer(timer_call_back& cb,
                                     time_stamp when,
                                     double interval) {
-        auto timer = std::make_shared<timer>(cb, when, interval);
-
-        return timer;
+        auto new_timer = std::make_shared<timer>(cb, when, interval);
+        return new_timer;
     }
 
     void timer_queue::cancel(timer_id& id) {
@@ -44,7 +43,7 @@ namespace snow
     }
 
     // move out all expired timers
-    std::vector<entry> timer_queue::get_expired(const time_stamp& now) {
+    std::vector<timer_queue::entry> timer_queue::get_expired(const time_stamp& now) {
         std::vector<entry> expired;
         entry sentry(now, std::shared_ptr<timer>());
         auto end = m_timers.lower_bound(sentry);
@@ -53,7 +52,7 @@ namespace snow
         return std::move(expired);
     }
 
-    void timer_queue::reset(const std::vector<entry>& expired, const time_stamp& now) {
+    void timer_queue::reset(std::vector<entry>& expired, const time_stamp& now) {
         for (auto& timer : expired) {
             if(timer.second->repeat()) {
                 timer.second->restart(now);
@@ -61,7 +60,7 @@ namespace snow
             }
         }
 
-        time_stamp next_expire = now + std::chrono::duration_cast<std::chrono::duration<double>>(1000.0);
+        time_stamp next_expire = now ;//+ std::chrono::duration_cast<std::chrono::duration<double>>(1000.0);
 
         if (!m_timers.empty()) {
             next_expire = m_timers.cbegin()->second->expiration();

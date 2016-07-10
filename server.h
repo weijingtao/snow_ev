@@ -31,6 +31,8 @@ namespace snow
 
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
+        virtual void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher) = 0;
+
     private:
         void check();
 
@@ -43,7 +45,7 @@ namespace snow
 
         void run();
 
-        void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher) = 0;
+
 
     protected:
         bool                    m_stop_flag;

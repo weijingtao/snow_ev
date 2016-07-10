@@ -15,4 +15,4 @@ set(SOURCE_FILES
         timer.cpp
         timer_queue.cpp
         awakener.cpp)
-add_executable(snow_libev ${SOURCE_FILES})
+add_library(snow_libev ${SOURCE_FILES})

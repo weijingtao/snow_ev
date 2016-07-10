@@ -12,7 +12,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <ev.h>
+#include "event.h"
 
 namespace snow {
     class acceptor {
@@ -23,11 +23,11 @@ namespace snow {
 
         acceptor(const std::string &ip, uint16_t port);
 
-        acceptor(acceptor &&rhs);
+//        acceptor(acceptor &&rhs);
 
         ~acceptor();
 
-        void operator=(acceptor &&rhs);
+//        void operator=(acceptor &&rhs);
 
         int init();
 
@@ -42,16 +42,15 @@ namespace snow {
         void enable_event_call_back();
 
     private:
-        static void handle_read(struct ev_loop *loop, ev_io *io_watcher, int revents);
-
         acceptor(const acceptor &) = delete;
-
         void operator=(const acceptor &) = delete;
 
-        void swap(acceptor &rhs);
+        void handle_read();
+
+//        void swap(acceptor &rhs);
 
     private:
-        std::unique_ptr<ev_io> m_io_watcher;
+        std::unique_ptr<event> m_event;
         std::string m_ip;
         uint16_t m_port;
         new_connection_handle_type m_new_connection_handle;
