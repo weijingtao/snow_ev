@@ -4,11 +4,10 @@
 
 #include "scheduler.h"
 
-#include <unistd.h>
+
 #include <cassert>
 #include <thread>
 #include <array>
-#include "context.h"
 
 namespace snow {
 
@@ -18,8 +17,8 @@ namespace snow {
     }
 
     scheduler::scheduler()
-        : m_loop(ev_loop_new()),
-          m_io_watcher(new ev_io) {
+        : m_poller(new poller),
+          m_timer_queue(new timer_queue(*m_poller.get())) {
 
     }
 

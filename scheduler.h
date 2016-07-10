@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <sys/types.h>
-#include <sys/socket.h>
+
 #include <memory>
 #include <functional>
 #include <deque>
-#include <ev.h>
+#include "poller.h"
+#include "timer_queue.h"
 
 namespace snow {
     class task;
@@ -33,23 +33,19 @@ namespace snow {
 
         void spawn(task_type_ptr &task);
 
-        struct ev_loop *event_loop() {
-            return m_loop.get();
+        poller& get_poller() {
         }
 
 
     private:
-        static void ev_io_call_back(struct ev_loop *, ev_io *, int);
-
-        static void ev_timer_call_back(struct ev_loop *, ev_timer *);
 
         void wake_up();
 
         void run();
 
     private:
-        std::unique_ptr<struct ev_loop> m_loop;
-        std::unique_ptr<ev_io> m_io_watcher;
+        std::unique_ptr<poller> m_poller;
+        std::unique_ptr<timer_queue> m_timer_queue;
         std::deque<std::unique_ptr<task_type>> m_task_queue;
         int m_socket_pair[2];
         bool m_running;
