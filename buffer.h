@@ -2,14 +2,11 @@
 // Created by weitao on 7/2/16.
 //
 
-#ifndef SNOW_LIBEV_BUFFER_H
-#define SNOW_LIBEV_BUFFER_H
-
-#ifndef _SNOW_BUFFER_HPP
-#define _SNOW_BUFFER_HPP
+#pragma once
 
 #include <cassert>
 #include <memory>
+#include <iostream>
 #include "logger.h"
 
 namespace snow
@@ -23,7 +20,7 @@ namespace snow
               m_size(init_size),
               m_read_index(0),
               m_write_index(0) {
-            SNOW_LOG_TRACE << "buffer construct" << std::endl;
+            SNOW_LOG_TRACE << "buffer construct" ;//<< std::endl;
         }
 
         //TODO
@@ -35,11 +32,11 @@ namespace snow
             rhs.m_size        = 0;
             rhs.m_read_index  = 0;
             rhs.m_write_index = 0;
-            SNOW_LOG_TRACE << "buffer move construct" << std::endl;
+            SNOW_LOG_TRACE << "buffer move construct";// << std::endl;
         }
 
         ~buffer() {
-            SNOW_LOG_TRACE << "buffer destruct" << std::endl;
+            SNOW_LOG_TRACE << "buffer destruct";// << std::endl;
         }
 
         std::size_t readable_bytes() const {
@@ -102,7 +99,3 @@ namespace snow
         std::size_t             m_write_index;
     };
 }
-
-#endif //_SNOW_BUFFER_HPP
-
-#endif //SNOW_LIBEV_BUFFER_H

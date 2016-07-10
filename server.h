@@ -13,7 +13,6 @@
 
 namespace snow
 {
-    template <typename session_type>
     class server
     {
     public:
@@ -33,9 +32,9 @@ namespace snow
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
     private:
-        static void check(ev_loop* loop, ev_check* watcher, int revents);
+        void check();
 
-        static void prepare(ev_loop* loop, ev_prepare* watcher, int revents);
+        void prepare();
 
 
     private:
@@ -44,7 +43,7 @@ namespace snow
 
         void run();
 
-        void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher);
+        void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher) = 0;
 
     protected:
         bool                    m_stop_flag;

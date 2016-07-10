@@ -34,9 +34,8 @@ namespace snow
         return log_instance;
     }
 
-    logger::logger()
-        : m_log_writer(default_log_writer()) {
-
+    logger::logger() {
+        m_log_writer = std::move(std::ref(m_default_log_writer));
     }
 
     log_obj logger::trace() const {
@@ -67,11 +66,6 @@ namespace snow
         std::stringstream log_message;
         log_message << "level[" << int(level) << "] " << str << std::endl;
         m_log_writer(log_message.str());
-    }
-
-    logger::default_log_writer::default_log_writer(default_log_writer &&rhs) {
-        using std::swap;
-        swap(m_mutex, rhs.m_mutex);
     }
 
     void logger::default_log_writer::operator()(const std::string &str) {

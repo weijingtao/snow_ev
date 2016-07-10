@@ -16,16 +16,12 @@ namespace snow
         m_timer_fd.set_timeout_cb(std::bind(&timer_queue::handle_timeout, this));
     }
 
-    ~timer_queue() {
-
-    }
-
     ///
     /// Schedules the callback to be run at given time,
     /// repeats if @c interval > 0.0.
     ///
     /// Must be thread safe. Usually be called from other threads.
-    timer_id timer_queue::add_timer(timer_call_back& cb,
+    timer_queue::timer_id timer_queue::add_timer(timer_call_back& cb,
                                     time_stamp when,
                                     double interval) {
         auto timer = std::make_shared<timer>(cb, when, interval);

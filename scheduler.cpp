@@ -42,7 +42,7 @@ namespace snow {
     }
 
     void scheduler::post(task_type_ptr &task) {
-        m_task_queue.push_back(task);
+        m_task_queue.push_back(std::move(task));
         wake_up();
     }
 

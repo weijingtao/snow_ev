@@ -8,7 +8,7 @@
 #include <mutex>
 #include <string>
 #include <sstream>
-#include <ostream>
+#include <iostream>
 
 namespace snow
 {
@@ -34,13 +34,12 @@ namespace snow
         ~log_obj();
 
         template <typename T>
-        log_obj& operator=(const T& value) {
+        log_obj& operator<<(const T& value) {
             m_buffer << value;
             return *this;
         }
 
-        template <char>
-        log_obj& operator=(const char* const value) {
+        log_obj& operator<<(const char* value) {
             m_buffer << value;
             return *this;
         }
@@ -90,8 +89,6 @@ namespace snow
         public:
             default_log_writer() = default;
 
-            default_log_writer(default_log_writer&& rhs);
-
             void operator()(const std::string& str);
 
         private:
@@ -105,6 +102,7 @@ namespace snow
 
     private:
         log_writer_type m_log_writer;
+        default_log_writer m_default_log_writer;
     };
 
 }

@@ -25,6 +25,8 @@ namespace snow
 
         poller();
 
+        ~poller();
+
         int add_event(std::shared_ptr<event>& event);
 
         int mod_event(std::shared_ptr<event>& event);
@@ -33,8 +35,7 @@ namespace snow
 
         void poll(std::vector<std::shared_ptr<event>>* read_event, uint32_t time_out);
 
-    protected:
-        ~poller();
+
 
     private:
         poller(const poller&) = delete;

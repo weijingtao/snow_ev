@@ -16,9 +16,8 @@
 namespace snow
 {
     poller::poller()
-        : m_epoll_fd(-1),
-          m_active_events,
-          m_active_event_count(0) {
+      : m_epoll_fd(-1),
+        m_active_event_count(0) {
         m_epoll_fd = epoll_create1(::EPOLL_CLOEXEC);
         assert(m_epoll_fd > 0);
     }
@@ -103,19 +102,21 @@ namespace snow
 
     void poller::poll(std::vector<std::shared_ptr<event>>* ready_event, uint32_t time_out) {
         assert(ready_event != nullptr);
-        ready_event->resize(m_events.size());
-        int active_events = epoll_wait(m_epoll_fd, &(*ready_event)[0], ready_event->size(), time_out);
+        std::vector<epoll_event> events;
+        events.resize(m_events.size());
+        int active_events = epoll_wait(m_epoll_fd, &events[0], events.size(), time_out);
         std::cout << "active_events : " << active_events << std::endl;
         if (active_events > 0) {
+            ready_event->resize(active_events);
             for (int index = 0; index < active_events; ++index) {
                 auto& ev = (*ready_event)[index];
 
                 uint32_t ready_mask = 0;
-                if (ev->events & EPOLLIN)
+                if (events[index].events & EPOLLIN)
                     ready_mask |= EV_READ;
-                if (ev->events & (EPOLLOUT | EPOLLERR | EPOLLHUP))
+                if (events[index].events & (EPOLLOUT | EPOLLERR | EPOLLHUP))
                     ready_mask |= EV_WRITE;
-                auto* event_ptr = static_cast<event*>(ev.data.ptr);
+                auto* event_ptr = static_cast<event*>(events[index].data.ptr);
                 event_ptr->set_ready_mask(ready_mask);
                 ready_event->push_back(event_ptr->shared_from_this());
                 if (event_ptr->is_oneshot()) {

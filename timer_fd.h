@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <chrono>
 #include "event.h"
 
 namespace snow
@@ -14,6 +15,7 @@ namespace snow
     class timer_fd
     {
     public:
+        typedef std::chrono::steady_clock::time_point time_stamp;
         typedef std::function<void(void)> time_out_cb;
 
         timer_fd(poller& poller1);
