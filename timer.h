@@ -26,6 +26,8 @@ namespace snow
 
         void restart(const time_stamp& now);
 
+        void cancel() {}
+
     private:
         timer(const timer&) = delete;
         void operator=(const timer&) = delete;

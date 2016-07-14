@@ -14,5 +14,7 @@ set(SOURCE_FILES
         timer_fd.cpp
         timer.cpp
         timer_queue.cpp
-        awakener.cpp)
+        awakener.cpp
+        connection.cpp
+        buffer.cpp)
 add_library(snow_libev ${SOURCE_FILES})

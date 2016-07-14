@@ -19,7 +19,7 @@ namespace snow {
     public:
         typedef std::function<void(int, const struct sockaddr &, int)> new_connection_handle_type;
 
-        acceptor();
+//        acceptor();
 
         acceptor(const std::string &ip, uint16_t port);
 
@@ -42,11 +42,11 @@ namespace snow {
         void handle_read();
 
     private:
-        std::unique_ptr<event> m_event;
-        std::string m_ip;
-        uint16_t m_port;
+        std::unique_ptr<event>     m_event;
         new_connection_handle_type m_new_connection_handle;
-        std::mutex m_mutex;
-        int m_socket_fd;
+        std::mutex                 m_mutex;
+        int                        m_socket_fd;
+        std::string                m_ip;
+        uint16_t                   m_port;
     };
 }

@@ -12,8 +12,8 @@
 namespace snow
 {
     awakener::awakener(std::shared_ptr<poller> &poller1)
-      : m_event{poller1},
-        m_socket_pair{-1, -1} {
+        : m_event{poller1},
+          m_socket_pair{-1, -1} {
         if (0 == ::socketpair(AF_LOCAL, ::SOCK_DGRAM, 0, m_socket_pair)) {
             ::shutdown(m_socket_pair[0], ::SHUT_RD);
             ::shutdown(m_socket_pair[1], ::SHUT_WR);
@@ -39,6 +39,8 @@ namespace snow
     void awakener::handle_read() {
         std::array<char, 32> buffer;
         std::size_t n_read = 0;
-        while ((n_read = ::read(m_socket_pair[1], buffer.data(), buffer.size())) > 0);
+        do {
+            n_read = ::read(m_socket_pair[1], buffer.data(), buffer.size());
+        } while (n_read > 0 || errno == EINTR);
     }
 }

@@ -14,16 +14,16 @@
 
 namespace snow {
 
-    acceptor::acceptor()
+/*    acceptor::acceptor()
         : acceptor("", 0) {
 
-    }
+    }*/
 
     acceptor::acceptor(const std::string &ip, uint16_t port)
         : m_event(new event),
+          m_socket_fd(-1),
           m_ip(ip),
-          m_port(0),
-          m_socket_fd(-1) {
+          m_port(0) {
     }
 
     acceptor::~acceptor() {
@@ -75,8 +75,8 @@ namespace snow {
     }
 
     void acceptor::handle_read() {
-        int client_fd = 0;
-        socklen_t addr_len = 0;
+        int client_fd             = 0;
+        socklen_t addr_len        = 0;
         struct sockaddr peer_addr = {0};
         do {
             client_fd = ::accept4(m_socket_fd, &peer_addr, &addr_len, ::SOCK_CLOEXEC | ::SOCK_NONBLOCK);
