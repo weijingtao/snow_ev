@@ -8,15 +8,26 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cassert>
+#include "tcp_socket.h"
+#include "udp_socket.h"
 
 namespace snow
 {
     std::shared_ptr<socket> socket::create(int domain, int type, int protocol) {
+        assert((domain == AF_INET) || (domain == AF_INET6));
+        assert((type == ::SOCK_STREAM) || (type == ::SOCK_DGRAM) || (type == ::SOCK_RAW));
+
         int socket_fd = ::socket(domain, type, protocol);
-        return std::make_shared<socket>(socket_fd);
+        switch(type) {
+            case ::SOCK_STREAM:
+                return std::make_shared<tcp_socket>(socket_fd);
+            case ::SOCK_DGRAM:
+                return std::make_shared<udp_socket>(socket_fd);
+
+        }
     }
 
-    socket::socket(int32_t fd)
+    socket::socket(int fd)
         : m_fd(fd) {
         assert(m_fd >= 0);
     }

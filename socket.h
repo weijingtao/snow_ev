@@ -16,7 +16,7 @@ namespace snow
     public:
         static std::shared_ptr<socket> create(int domain, int type, int protocol);
 
-        explicit socket(int32_t fd);
+        explicit socket(int fd);
 
         virtual ~socket();
 
@@ -46,7 +46,7 @@ namespace snow
 
 
     private:
-        int32_t m_fd;
+        int m_fd;
         std::shared_ptr<endpoint> m_local_endpoint;
         endpoint                  m_peer_endpoint;
     };

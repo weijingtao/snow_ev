@@ -21,5 +21,8 @@ set(SOURCE_FILES
         buffer.cpp
         config.cpp
         endpoint.cpp
-        socket.cpp)
+        socket.cpp
+        tcp_socket.cpp
+        udp_socket.cpp
+        raw_socket.cpp)
 add_library(snow_libev ${SOURCE_FILES})
