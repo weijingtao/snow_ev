@@ -9,7 +9,7 @@
 #include <cassert>
 #include <cstring>
 #include "scheduler.h"
-#include "logger.h"
+#include "logger/logger.h"
 
 
 namespace snow {

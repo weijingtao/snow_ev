@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 project(snow_net)
 
+#include_directories(../event)
+#include_directories(../timer)
+#include_directories(../logger)
+include_directories(..)
 set(NET_SOURCE_FILES
         acceptor.cpp
-        poller.cpp
         connection.cpp
         endpoint.cpp
         socket.cpp

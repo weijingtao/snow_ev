@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 project(snow_timer)
 
 include_directories(../event)
+include_directories(../net)
+
 set(TIMER_SOURCE_FILES
         timer_fd.cpp
         timer.cpp

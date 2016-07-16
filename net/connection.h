@@ -9,8 +9,8 @@
 #include <fcntl.h>
 #include <memory>
 #include <functional>
-#include "event.h"
-#include "timer.h"
+#include "event/event.h"
+#include "timer/timer.h"
 #include "buffer.h"
 
 void enable_nonblock(int fd) {
