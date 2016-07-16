@@ -16,10 +16,10 @@ namespace snow
     {
         TRACE   = 0,
         DEBUG   = 1,
-        INFO    = 3,
-        WARNING = 4,
-        ERROR   = 5,
-        FATAL   = 6
+        INFO    = 2,
+        WARNING = 3,
+        ERROR   = 4,
+        FATAL   = 5
     };
 
     class log_obj

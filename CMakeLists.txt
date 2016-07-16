@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 project(snow)
 
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -o0 -std=c++11")
-include_directories(/usr/local/include)
+include_directories(../yaml-cpp/include)
 
 set(SOURCE_FILES
         acceptor.cpp
