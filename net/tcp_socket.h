@@ -12,5 +12,9 @@ namespace snow
     {
     public:
         tcp_socket(int fd);
+
+        virtual std::size_t read(char* buf, std::size_t len);
+
+        virtual std::size_t write(const char* const buf, std::size_t len);
     };
 }

@@ -6,10 +6,14 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 #include <cassert>
+#include <cstring>
 #include "tcp_socket.h"
 #include "udp_socket.h"
+#include "logger/logger.h"
 
 namespace snow
 {
@@ -36,6 +40,34 @@ namespace snow
         if(m_fd >= 0) {
             ::close(m_fd);
             m_fd = -1;
+        }
+    }
+
+    void socket::enable_nonblock() {
+        int flags = fcntl(m_fd, F_GETFL, 0);
+        fcntl(m_fd, F_SETFL, flags | O_NONBLOCK);
+    }
+
+    void socket::enable_reuse_addr() {
+        bool reuse_addr = true;
+        if(0 != setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&reuse_addr), sizeof(reuse_addr))) {
+            SNOW_LOG_FATAL << "errno:" << errno << ", errmsg:" << ::strerror(errno);
+        }
+    }
+
+    void socket::enable_reuse_port() {
+
+    }
+
+    void socket::set_send_buf_len(int len) {
+        if(0 != setsockopt(m_fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&len), sizeof(len))) {
+            SNOW_LOG_FATAL << "errno:" << errno << ", errmsg:" << ::strerror(errno);
+        }
+    }
+
+    void socket::set_recv_buf_len(int len) {
+        if(0 != setsockopt(m_fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&len), sizeof(len))) {
+            SNOW_LOG_FATAL << "errno:" << errno << ", errmsg:" << ::strerror(errno);
         }
     }
 }

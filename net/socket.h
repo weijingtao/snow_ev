@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <locale>
 #include "endpoint.h"
 
 struct sockaddr;
@@ -43,6 +45,20 @@ namespace snow
         const endpoint& get_peer_endpoint() const {
             return m_peer_endpoint;
         }
+
+        virtual std::size_t read(char* buf, std::size_t len) = 0;
+
+        virtual std::size_t write(const char* const buf, std::size_t len) = 0;
+
+        void enable_nonblock();
+
+        void enable_reuse_port();
+
+        void enable_reuse_addr();
+
+        void set_send_buf_len(int len);
+
+        void set_recv_buf_len(int len);
 
 
     private:
