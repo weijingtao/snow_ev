@@ -70,4 +70,8 @@ namespace snow
             SNOW_LOG_FATAL << "errno:" << errno << ", errmsg:" << ::strerror(errno);
         }
     }
+
+    bool socket::bind(const endpoint &addr) {
+        return false;
+    }
 }

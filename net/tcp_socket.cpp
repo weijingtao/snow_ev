@@ -62,4 +62,8 @@ namespace snow
             }
         } while(true);
     }
+
+    void tcp_socket::accept(std::vector<tcp_socket> *sockets) {
+        assert(nullptr != sockets);
+    }
 }

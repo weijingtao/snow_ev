@@ -13,6 +13,8 @@
 #include <memory>
 #include <mutex>
 #include "../event/event.h"
+#include "endpoint.h"
+#include "tcp_socket.h"
 
 namespace snow {
     class acceptor {
@@ -21,7 +23,7 @@ namespace snow {
 
 //        acceptor();
 
-        acceptor(const std::string &ip, uint16_t port);
+        acceptor(const endpoint& addr);
 
         ~acceptor();
 
@@ -45,8 +47,7 @@ namespace snow {
         std::unique_ptr<event>     m_event;
         new_connection_handle_type m_new_connection_handle;
         std::mutex                 m_mutex;
-        int                        m_socket_fd;
-        std::string                m_ip;
-        uint16_t                   m_port;
+        tcp_socket                 m_socket;
+        endpoint                   m_local_addr;
     };
 }

@@ -26,6 +26,14 @@ namespace snow
 
         const struct sockaddr& sockaddr() const;
 
+        bool is_v4() {
+            return true;
+        }
+
+        bool is_v6() {
+            return false;
+        }
+
 
     private:
         struct sockaddr m_addr;

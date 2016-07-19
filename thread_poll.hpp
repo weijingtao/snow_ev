@@ -12,9 +12,12 @@ namespace snow
     public:
         typedef std::function<void(void)> task_type;
         thread_poll(std::size_t thread_size)
-            : m_thread_size(thread_size),
-              m_threads(m_thread_size) {
+            : m_threads(thread_size) {
 
+        }
+
+        void set_poll_size(std::size_t thread_count) {
+            m_threads.resize(thread_count);
         }
 
         void start(task_type task) {
@@ -31,10 +34,7 @@ namespace snow
             }
         }
 
-
-
     private:
-        std::size_t              m_thread_size;
         std::vector<std::thread> m_threads;
     };
 }

@@ -4,7 +4,12 @@
 
 #include "server.h"
 
-#include <sys/sysinfo.h>
+#include <cstdio>
+#include <cassert>
+#include <endpoint.h>
+#include "config.h"
+#include "utils/net_helper.h"
+
 
 namespace snow {
     server::server()
@@ -17,6 +22,45 @@ namespace snow {
         stop();
     }
 
+    int server::init(const std::string& file_name) {
+        config conf(file_name);
+        m_max_connecction        = conf.get_max_connection();
+        m_connection_timeout     = conf.get_connection_timeout();
+        m_max_request_per_second = conf.get_max_request_per_second();
+        m_thread_poll.set_poll_size(conf.get_proc_num());
+
+        auto& addrs = conf.get_endpoints();
+        for(auto& addr : addrs) {
+            char interface[32] = {0};
+            uint16_t port = 0;
+            char proto[32] = {0};
+            if(3 != sscanf(addr.c_str(), "%s:%u/%s", interface, &port, proto)) {
+                continue;
+            }
+            if(port == 0) {
+                continue;
+            }
+            sockaddr sock_addr = {0};
+            if(0 != utils::get_local_addr(interface, &sock_addr)) {
+                continue;
+            }
+            if(AF_INET == sock_addr.sa_family) {
+                reinterpret_cast<sockaddr_in*>(&sock_addr)->sin_port = ::htons(port);
+            } else if(AF_INET6 == sock_addr.sa_family) {
+                reinterpret_cast<sockaddr_in6*>(&sock_addr)->sin6_port = ::htons(port);
+            } else {
+                continue;
+            }
+            endpoint bind_addr(sock_addr);
+            if(bind_addr) {
+                m_acceptors.emplace_back(bind_addr);
+            }
+        }
+        assert(!m_acceptors.empty());
+
+        return 0;
+    }
+
     void server::start() {
         m_stop_flag = false;
         run();
@@ -26,10 +70,7 @@ namespace snow {
         m_stop_flag = true;
     }
 
-    int server::init() {
-        int cpu_count = ::get_nprocs();
-        return 0;
-    }
+
 
     void server::check() {
         for (auto &acceptor : m_acceptors) {

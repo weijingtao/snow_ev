@@ -23,6 +23,14 @@ namespace snow
 
         virtual ~socket();
 
+        void set_socket_fd(int fd) {
+            m_fd = fd;
+        }
+
+        int get_socket_fd() const {
+            return m_fd;
+        }
+
         void set_local_endpoint(const std::shared_ptr<endpoint>& local_endpoint) {
             m_local_endpoint = local_endpoint;
         }
@@ -60,6 +68,8 @@ namespace snow
         void set_send_buf_len(int len);
 
         void set_recv_buf_len(int len);
+
+        bool bind(const endpoint& addr);
 
 
     protected:

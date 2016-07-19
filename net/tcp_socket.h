@@ -6,6 +6,8 @@
 
 #include "socket.h"
 
+#include <vector>
+
 namespace snow
 {
     class tcp_socket : public socket
@@ -16,5 +18,11 @@ namespace snow
         virtual std::size_t read(buffer* buf);
 
         virtual std::size_t write(buffer& buf);
+
+        bool listen() {
+            return false;
+        }
+
+        void accept(std::vector<tcp_socket>* sockets);
     };
 }

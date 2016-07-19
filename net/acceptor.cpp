@@ -19,16 +19,20 @@ namespace snow {
 
     }*/
 
-    acceptor::acceptor(const std::string &ip, uint16_t port)
+    acceptor::acceptor(const endpoint& addr)
         : m_event(new event),
-          m_socket_fd(-1),
-          m_ip(ip),
-          m_port(0) {
+          m_socket(-1),
+          m_local_addr(addr) {
+        int fd = ::socket(addr.is_v4() ? AF_INET : AF_INET6, SOCK_STREAM, 0);
+        assert(fd >= 0);
+        m_socket.set_socket_fd(fd);
+        m_socket.enable_nonblock();
+        m_socket.enable_reuse_addr();
+        m_socket.bind(m_local_addr);
+        m_socket.listen();
     }
 
     acceptor::~acceptor() {
-        ::close(m_socket_fd);
-        m_socket_fd = -1;
     }
 
     int acceptor::init() {

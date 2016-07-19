@@ -6,7 +6,8 @@
 
 #include <cstdint>
 #include <vector>
-#include <ev.h>
+#include <string>
+#include <functional>
 #include "thread_poll.hpp"
 #include "buffer.h"
 #include "acceptor.h"
@@ -22,12 +23,14 @@ namespace snow
 
         virtual ~server();
 
+        int init(const std::string&);
+
         void start();
 
         void stop();
 
     protected:
-        virtual int init();
+
 
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
@@ -51,6 +54,10 @@ namespace snow
         bool                    m_stop_flag;
         std::vector<acceptor>   m_acceptors;
         thread_poll             m_thread_poll;
+        int m_proc_num;
+        int m_connection_timeout; //ms
+        int m_max_connecction;
+        int m_max_request_per_second;
     };
 }
 
