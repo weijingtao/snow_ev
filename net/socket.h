@@ -8,6 +8,7 @@
 #include <memory>
 #include <locale>
 #include "endpoint.h"
+#include "buffer.h"
 
 struct sockaddr;
 
@@ -46,9 +47,9 @@ namespace snow
             return m_peer_endpoint;
         }
 
-        virtual std::size_t read(char* buf, std::size_t len) = 0;
+        virtual std::size_t read(buffer* buf) = 0;
 
-        virtual std::size_t write(const char* const buf, std::size_t len) = 0;
+        virtual std::size_t write(buffer& buf) = 0;
 
         void enable_nonblock();
 
@@ -61,7 +62,7 @@ namespace snow
         void set_recv_buf_len(int len);
 
 
-    private:
+    protected:
         int m_fd;
         std::shared_ptr<endpoint> m_local_endpoint;
         endpoint                  m_peer_endpoint;

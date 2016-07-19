@@ -4,6 +4,11 @@
 
 #include "tcp_socket.h"
 
+#include <sys/uio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <cassert>
+
 namespace snow
 {
     tcp_socket::tcp_socket(int fd)
@@ -11,74 +16,50 @@ namespace snow
 
     }
 
-    std::size_t tcp_socket::read(char *buf, std::size_t len) {
+    std::size_t tcp_socket::read(buffer* buf) {
+        thread_local static char common_buffer[65536];
         ssize_t read_bytes = 0;
         while (true){
-            m_recv_buffer.ensure_writeable_bytes(1500);
-            read_bytes = ::read(m_socket_fd, m_recv_buffer.write_index(), m_recv_buffer.writeable_bytes());
+            buf->ensure_writeable_bytes(1500);
+            struct iovec iov[2] = {0};
+            iov[0].iov_base = buf->write_index();
+            iov[0].iov_len  = buf->writeable_bytes();
+            iov[1].iov_base = common_buffer;
+            iov[1].iov_len  = sizeof(common_buffer);
+            read_bytes = ::readv(m_fd, iov, sizeof(iov)/sizeof(iovec));
             if(0 == read_bytes) {
-                m_timer->cancel();
-                m_io_event->disable_all();
-                delete this;
+                return 0;
             }
             if (read_bytes > 0) {
-                m_recv_buffer.increase_write_index(read_bytes);
+                std::size_t writeable_bytes = buf->writeable_bytes();
+                buf->increase_write_index(buf->writeable_bytes());
+                if(read_bytes > buf->writeable_bytes()) {
+                    buf->append(common_buffer, read_bytes - writeable_bytes);
+                }
+                return read_bytes;
             }
             else {
                 if (errno == EINTR) {
                     continue;
                 }
-                if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    break;
-                }
+                return -1;
             }
         }
-        std::size_t pkg_len = 0;
-        while ((pkg_len = m_pkg_spliter(m_recv_buffer.read_index(), m_recv_buffer.readable_bytes())) > 0) {
-            m_dispatcher(buffer(m_recv_buffer.read_index(), pkg_len));
-            m_recv_buffer.increase_read_index(pkg_len);
-        }
-        return 0;
     }
 
-    std::size_t tcp_socket::write(const char *const buf, std::size_t len) {
-        if(m_send_buffer.readable_bytes() > 0) {
-            iovec ios[2];
-            ios[0].iov_base = m_send_buffer.read_index();
-            ios[0].iov_len  = m_send_buffer.readable_bytes();
-            ios[1].iov_base = const_cast<char*>(data.read_index());
-            ios[1].iov_len  = data.readable_bytes();
-            std::size_t write_bytes = writev(m_socket_fd, ios, sizeof(ios)/sizeof(iovec));
+    std::size_t tcp_socket::write(buffer& buf) {
+        assert(buf.readable_bytes() > 0);
+        do {
+            std::size_t write_bytes = ::write(m_fd, buf.read_index(), buf.readable_bytes());
             if(write_bytes > 0) {
-                if(write_bytes == (m_send_buffer.readable_bytes() + data.readable_bytes())) {
-                    return;
-                }
-                if(write_bytes > m_send_buffer.readable_bytes()) {
-                    std::size_t old_readable_bytes = m_send_buffer.readable_bytes();
-                    m_send_buffer.increase_read_index(m_send_buffer.readable_bytes());
-                    m_send_buffer.append(data.read_index() + (write_bytes - old_readable_bytes), (data.readable_bytes() + old_readable_bytes - write_bytes));
-                    return;
-                }
-                if(write_bytes <= m_send_buffer.readable_bytes()) {
-                    m_send_buffer.increase_read_index(write_bytes);
-                    m_send_buffer.append(data.read_index(), data.readable_bytes());
-                    return;
-                }
+                buf.increase_read_index(write_bytes);
+                return write_bytes;
             } else {
-                m_send_buffer.append(data.read_index(), data.readable_bytes());
-                return;
+                if (errno == EINTR) {
+                    continue;
+                }
+                return -1;
             }
-        }
-        else {
-            std::size_t write_bytes = write(m_socket_fd, data.read_index(), data.readable_bytes());
-            if(write_bytes > 0) {
-                m_send_buffer.append(data.read_index() + write_bytes, data.readable_bytes() - write_bytes);
-                return;
-            } else {
-                m_send_buffer.append(data.read_index(), data.readable_bytes());
-                return;
-            }
-        }
-        return 0;
+        } while(true);
     }
 }
