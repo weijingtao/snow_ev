@@ -36,7 +36,7 @@ namespace snow {
     }
 
     int acceptor::init() {
-        struct sockaddr_in bind_addr = {0};
+        /*struct sockaddr_in bind_addr = {0};
         bind_addr.sin_family = AF_INET;
         bind_addr.sin_port = ::htons(m_port);
         if (::inet_pton(AF_INET, m_ip.c_str(), &bind_addr.sin_addr) < 0) {
@@ -55,7 +55,7 @@ namespace snow {
         if (::listen(m_socket_fd, 10) < 0) {
             SNOW_LOG_FATAL << "errno[" << errno << "]: " << strerror(errno);
             return -1;
-        }
+        }*/
         return 0;
     }
 
@@ -79,6 +79,14 @@ namespace snow {
     }
 
     void acceptor::handle_read() {
+        std::vector<tcp_socket> sockets;
+        m_socket.accept(&sockets);
+        if(m_new_connection_handle && !sockets.empty()) {
+            for(auto& socket : sockets) {
+//                m_new_connection_handle()
+            }
+        }
+        /*
         int client_fd             = 0;
         socklen_t addr_len        = 0;
         struct sockaddr peer_addr = {0};
@@ -95,6 +103,6 @@ namespace snow {
                     continue;
                 }
             }
-        } while (true);
+        } while (true);*/
     }
 }

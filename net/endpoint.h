@@ -26,11 +26,11 @@ namespace snow
 
         const struct sockaddr& sockaddr() const;
 
-        bool is_v4() {
+        bool is_v4() const {
             return true;
         }
 
-        bool is_v6() {
+        bool is_v6() const {
             return false;
         }
 
