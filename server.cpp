@@ -32,7 +32,7 @@ namespace snow {
         auto& addrs = conf.get_endpoints();
         for(auto& addr : addrs) {
             char interface[32] = {0};
-            uint16_t port = 0;
+            uint32_t port = 0;
             char proto[32] = {0};
             if(3 != sscanf(addr.c_str(), "%s:%u/%s", interface, &port, proto)) {
                 continue;

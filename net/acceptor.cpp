@@ -14,11 +14,6 @@
 
 namespace snow {
 
-/*    acceptor::acceptor()
-        : acceptor("", 0) {
-
-    }*/
-
     acceptor::acceptor(const endpoint& addr)
         : m_event(new event),
           m_socket(-1),

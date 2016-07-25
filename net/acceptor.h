@@ -21,8 +21,6 @@ namespace snow {
     public:
         typedef std::function<void(int, const struct sockaddr &, int)> new_connection_handle_type;
 
-//        acceptor();
-
         acceptor(const endpoint& addr);
 
         ~acceptor();

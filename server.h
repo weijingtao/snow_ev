@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <list>
 #include <string>
 #include <functional>
 #include "thread_poll.hpp"
@@ -52,7 +53,7 @@ namespace snow
 
     protected:
         bool                    m_stop_flag;
-        std::vector<acceptor>   m_acceptors;
+        std::list<acceptor>   m_acceptors;
         thread_poll             m_thread_poll;
         int m_proc_num;
         int m_connection_timeout; //ms
