@@ -55,15 +55,15 @@ private:
 
     bool is_log_format_valid(const std::string& log_format) const;
 
-    static const int  MIN_PROC_NUM                   = 1;
-    static const int  DEFAULT_CONNECTION_TIMEOUT     = 60 * 1000; //1min
-    static const int  MIN_CONNECTION_TIMEOUT         = 1000; //1s
-    static const int  DEFAULT_MAX_CONNECTION         = 100;
-    static const int  MIN_CONNECTION                 = 1;
-    static const int  DEFAULT_MAX_REQUEST_PER_SECOND = 1000;
-    static const int  DEFAULT_LOG_LEVEL              = 3;
-    static const int  MIN_LOG_LEVEL                  = 0;
-    static const int  MAX_LOG_LEVEL                  = 6;
+    static const int  MIN_PROC_NUM;//                   = 1;
+    static const int  DEFAULT_CONNECTION_TIMEOUT;//     = 60 * 1000; //1min
+    static const int  MIN_CONNECTION_TIMEOUT;//         = 1000; //1s
+    static const int  DEFAULT_MAX_CONNECTION;//         = 100;
+    static const int  MIN_CONNECTION;//                 = 1;
+    static const int  DEFAULT_MAX_REQUEST_PER_SECOND;// = 1000;
+    static const int  DEFAULT_LOG_LEVEL;//              = 3;
+    static const int  MIN_LOG_LEVEL;//                  = 0;
+    static const int  MAX_LOG_LEVEL;//                  = 6;
     static const char * const DEFAULT_LOG_FORMATE;
 
 

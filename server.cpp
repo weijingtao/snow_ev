@@ -6,7 +6,7 @@
 
 #include <cstdio>
 #include <cassert>
-#include <endpoint.h>
+#include "net/endpoint.h"
 #include "config.h"
 #include "utils/net_helper.h"
 

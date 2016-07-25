@@ -8,10 +8,19 @@
 #include <exception>
 #include <algorithm>
 #include "yaml-cpp/yaml.h"
-#include "logger.h"
+#include "logger/logger.h"
 
 namespace snow
 {
+    const int  config::MIN_PROC_NUM                   = 1;
+    const int  config::DEFAULT_CONNECTION_TIMEOUT     = 60 * 1000; //1min
+    const int  config::MIN_CONNECTION_TIMEOUT         = 1000; //1s
+    const int  config::DEFAULT_MAX_CONNECTION         = 100;
+    const int  config::MIN_CONNECTION                 = 1;
+    const int  config::DEFAULT_MAX_REQUEST_PER_SECOND = 1000;
+    const int  config::DEFAULT_LOG_LEVEL              = 3;
+    const int  config::MIN_LOG_LEVEL                  = 0;
+    const int  config::MAX_LOG_LEVEL                  = 6;
     const char* const config::DEFAULT_LOG_FORMATE = "";
 
     /*config& config::instance() {
@@ -47,7 +56,7 @@ namespace snow
                 if(config["service"]["log"] && config["service"]["log"].IsMap())
                 {
                     if(config["service"]["log"]["level"]) {
-                        m_log_level = std::max(MIN_LOG_LEVEL, config["service"]["log"]["level"].as<int>());
+                        m_log_level = std::max(config::MIN_LOG_LEVEL, config["service"]["log"]["level"].as<int>());
                         m_log_level = std::min(m_log_level, config["service"]["log"]["level"].as<int>());
                     }
                     if(config["service"]["log"]["format"] && is_log_format_valid(config["service"]["log"]["format"].as<std::string>())) {
@@ -74,5 +83,9 @@ namespace snow
             SNOW_LOG_FATAL << "config init failed : " << e.what();
             return -1;
         }
+    }
+
+    bool config::is_log_format_valid(const std::string& log_format) const {
+        return true;
     }
 }

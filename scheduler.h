@@ -12,7 +12,6 @@
 #include "awakener.h"
 
 namespace snow {
-    class task;
 
     class scheduler {
     public:

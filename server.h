@@ -10,8 +10,8 @@
 #include <string>
 #include <functional>
 #include "thread_poll.hpp"
-#include "buffer.h"
-#include "acceptor.h"
+#include "net/buffer.h"
+#include "net/acceptor.h"
 
 namespace snow
 {

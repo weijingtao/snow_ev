@@ -13,8 +13,8 @@
 namespace snow {
 
     scheduler &scheduler::instance() {
-        static thread_local scheduler the_scheduler;
-        return the_scheduler;
+        static thread_local scheduler scheduler_instance;
+        return scheduler_instance;
     }
 
     scheduler::scheduler()
