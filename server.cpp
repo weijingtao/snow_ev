@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cassert>
+#include <regex>
 #include "net/endpoint.h"
 #include "config.h"
 #include "utils/net_helper.h"
@@ -31,17 +32,25 @@ namespace snow {
 
         auto& addrs = conf.get_endpoints();
         for(auto& addr : addrs) {
-            char interface[32] = {0};
+            SNOW_LOG_DEBUG << addr ;
+            std::string interface;
+            std::string proto;
             uint32_t port = 0;
-            char proto[32] = {0};
-            if(3 != sscanf(addr.c_str(), "%s:%u/%s", interface, &port, proto)) {
-                continue;
-            }
+            auto pos1 = addr.find_first_of(':');
+            if(pos1 != std::string::npos)
+                interface = addr.substr(0, pos1);
+            auto pos2 = addr.find_first_of('/');
+            if(pos2 != std::string::npos)
+                port = std::stoi(addr.substr(pos1 + 1, pos2 - pos1));
+            proto = addr.substr(pos2 + 1);
+
+            SNOW_LOG_DEBUG << interface << ":" << port << "/" << proto;
             if(port == 0) {
                 continue;
             }
             sockaddr sock_addr = {0};
             if(0 != utils::get_local_addr(interface, &sock_addr)) {
+                SNOW_LOG_DEBUG;
                 continue;
             }
             if(AF_INET == sock_addr.sa_family) {
@@ -49,6 +58,7 @@ namespace snow {
             } else if(AF_INET6 == sock_addr.sa_family) {
                 reinterpret_cast<sockaddr_in6*>(&sock_addr)->sin6_port = ::htons(port);
             } else {
+                SNOW_LOG_DEBUG;
                 continue;
             }
             endpoint bind_addr(sock_addr);
@@ -56,7 +66,14 @@ namespace snow {
                 m_acceptors.emplace_back(bind_addr);
             }
         }
+        endpoint bind_addr("127.0.0.1", 50000);
+        if(bind_addr) {
+            m_acceptors.emplace_back(bind_addr);
+        }
         assert(!m_acceptors.empty());
+        for(auto& acceptor : m_acceptors) {
+            acceptor.set_new_connection_handle(std::bind(&server::handle_new_connection, this, std::placeholders::_1));
+        }
 
         return 0;
     }
@@ -70,7 +87,9 @@ namespace snow {
         m_stop_flag = true;
     }
 
+    void server::handle_new_connection(connection &) {
 
+    }
 
     void server::check() {
         for (auto &acceptor : m_acceptors) {

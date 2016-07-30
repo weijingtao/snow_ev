@@ -22,6 +22,7 @@ namespace snow
         assert((type == ::SOCK_STREAM) || (type == ::SOCK_DGRAM) || (type == ::SOCK_RAW));
 
         int socket_fd = ::socket(domain, type, protocol);
+        SNOW_LOG_DEBUG << "create socket, fd :" << socket_fd;
         switch(type) {
             case ::SOCK_STREAM:
                 return std::make_shared<tcp_socket>(socket_fd);
@@ -49,9 +50,9 @@ namespace snow
     }
 
     void socket::enable_reuse_addr() {
-        bool reuse_addr = true;
+        int reuse_addr = 1;
         if(0 != setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&reuse_addr), sizeof(reuse_addr))) {
-            SNOW_LOG_FATAL << "errno:" << errno << ", errmsg:" << ::strerror(errno);
+            SNOW_LOG_FATAL << "socket fd :" << m_fd << " errno:" << errno << ", errmsg:" << ::strerror(errno);
         }
     }
 

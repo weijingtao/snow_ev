@@ -16,11 +16,11 @@ namespace snow {
 
     acceptor::acceptor(const endpoint& addr)
         : m_event(new event),
-          m_socket(-1),
+          m_socket(::socket(addr.is_v4() ? AF_INET : AF_INET6, SOCK_STREAM, 0)),
           m_local_addr(addr) {
-        int fd = ::socket(addr.is_v4() ? AF_INET : AF_INET6, SOCK_STREAM, 0);
-        assert(fd >= 0);
-        m_socket.set_socket_fd(fd);
+//        int fd = ::socket(addr.is_v4() ? AF_INET : AF_INET6, SOCK_STREAM, 0);
+//        assert(fd >= 0);
+//        m_socket.set_socket_fd(fd);
         m_socket.enable_nonblock();
         m_socket.enable_reuse_addr();
         m_socket.bind(m_local_addr);
@@ -54,8 +54,8 @@ namespace snow {
         return 0;
     }
 
-    void acceptor::set_new_connection_handle(new_connection_handle_type &handle) {
-        m_new_connection_handle = handle;
+    void acceptor::set_new_connection_handle(new_connection_handle_type handle) {
+        m_new_connection_handle = std::move(handle);
     }
 
     bool acceptor::try_lock() {
@@ -79,26 +79,8 @@ namespace snow {
         m_socket.accept(&sockets);
         if(m_new_connection_handle && !sockets.empty()) {
             for(auto& socket : sockets) {
-//                m_new_connection_handle()
+                m_new_connection_handle(connection(socket));
             }
         }
-        /*
-        int client_fd             = 0;
-        socklen_t addr_len        = 0;
-        struct sockaddr peer_addr = {0};
-        do {
-            client_fd = ::accept4(m_socket_fd, &peer_addr, &addr_len, ::SOCK_CLOEXEC | ::SOCK_NONBLOCK);
-            if (client_fd > 0) {
-                if(m_new_connection_handle)
-                    m_new_connection_handle(client_fd, peer_addr, addr_len);
-            } else {
-                if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
-                    break;
-                }
-                if (errno == EINTR) {
-                    continue;
-                }
-            }
-        } while (true);*/
     }
 }

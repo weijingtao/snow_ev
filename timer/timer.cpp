@@ -6,6 +6,12 @@
 
 namespace snow
 {
+    timer::timer()
+        : m_interval(0.0),
+          m_repeat(false) {
+
+    }
+
     timer::timer(const timer_call_back& cb, time_stamp when, double interval)
         : m_call_back(std::move(cb)),
           m_expiration(when),

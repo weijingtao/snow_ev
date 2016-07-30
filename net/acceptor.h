@@ -15,11 +15,12 @@
 #include "../event/event.h"
 #include "endpoint.h"
 #include "tcp_socket.h"
+#include "connection.h"
 
 namespace snow {
     class acceptor {
     public:
-        typedef std::function<void(int, const struct sockaddr &, int)> new_connection_handle_type;
+        typedef std::function<void(connection&)> new_connection_handle_type;
 
         acceptor(const endpoint& addr);
 
@@ -27,7 +28,7 @@ namespace snow {
 
         int init();
 
-        void set_new_connection_handle(new_connection_handle_type &handle);
+        void set_new_connection_handle(new_connection_handle_type handle);
 
         bool try_lock();
 

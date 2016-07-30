@@ -68,7 +68,7 @@ namespace snow
             if(config["limits"] && config["limits"].IsMap())
             {
                 if(config["limits"]["max_connection"]) {
-                    m_max_connecction = std::max(MIN_CONNECTION, config["limits"]["tcp_max_connection"].as<int>());
+                    m_max_connecction = std::max(MIN_CONNECTION, config["limits"]["max_connection"].as<int>());
                 }
                 if(config["limits"]["connection_timeout"]) {
                     m_connection_timeout = std::max(MIN_CONNECTION_TIMEOUT, config["limits"]["connection_timeout"].as<int>());

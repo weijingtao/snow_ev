@@ -107,9 +107,9 @@ namespace snow
 
 }
 
-#define SNOW_LOG_TRACE   snow::logger::instance().trace()
-#define SNOW_LOG_DEBUG   snow::logger::instance().debug()
-#define SNOW_LOG_INFO    snow::logger::instance().info()
-#define SNOW_LOG_WARNING snow::logger::instance().warning()
-#define SNOW_LOG_ERROR   snow::logger::instance().error()
-#define SNOW_LOG_FATAL   snow::logger::instance().fatal()
+#define SNOW_LOG_TRACE   snow::logger::instance().trace() << __FILE__ << ":" << __FUNCTION__ << "[" << __LINE__ << "] "
+#define SNOW_LOG_DEBUG   snow::logger::instance().debug() << __FILE__ << ":" << __FUNCTION__ << "[" << __LINE__ << "] "
+#define SNOW_LOG_INFO    snow::logger::instance().info() << __FILE__ << ":" << __FUNCTION__ << "[" << __LINE__ << "] "
+#define SNOW_LOG_WARNING snow::logger::instance().warning() << __FILE__ << ":" << __FUNCTION__ << "[" << __LINE__ << "] "
+#define SNOW_LOG_ERROR   snow::logger::instance().error() << __FILE__ << ":" << __FUNCTION__ << "[" << __LINE__ << "] "
+#define SNOW_LOG_FATAL   snow::logger::instance().fatal() << __FILE__ << ":" << __FUNCTION__ << "[" << __LINE__ << "] "

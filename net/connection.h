@@ -12,11 +12,7 @@
 #include "event/event.h"
 #include "timer/timer.h"
 #include "buffer.h"
-
-void enable_nonblock(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-}
+#include "tcp_socket.h"
 
 namespace snow
 {
@@ -28,7 +24,7 @@ namespace snow
         typedef std::function<void(const buffer&)> dispatcher_type;
         typedef std::function<std::size_t(const char*const, std::size_t)> pkg_split_type;
 
-        explicit connection(int socket_fd);
+        explicit connection(tcp_socket& socket);
 
         ~connection();
 
@@ -54,12 +50,12 @@ namespace snow
         void handle_timeout();
 
     private:
-        std::unique_ptr<event> m_io_event;
-        std::unique_ptr<timer> m_timer;
+        tcp_socket             m_socket;
+        event                  m_io_event;
+        timer                  m_timer;
         dispatcher_type        m_dispatcher;
         pkg_split_type         m_pkg_spliter;
         buffer                 m_recv_buffer;
         buffer                 m_send_buffer;
-        int                    m_socket_fd;
     };
 }

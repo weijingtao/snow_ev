@@ -32,6 +32,7 @@ namespace snow
 
     protected:
 
+        virtual void handle_new_connection(connection&);
 
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
@@ -53,7 +54,7 @@ namespace snow
 
     protected:
         bool                    m_stop_flag;
-        std::list<acceptor>   m_acceptors;
+        std::list<acceptor>     m_acceptors;
         thread_poll             m_thread_poll;
         int m_proc_num;
         int m_connection_timeout; //ms

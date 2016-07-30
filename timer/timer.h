@@ -16,6 +16,8 @@ namespace snow
         typedef std::chrono::steady_clock::time_point time_stamp;
         typedef std::function<void()>                 timer_call_back;
 
+        timer();
+
         timer(const timer_call_back& cb, time_stamp when, double interval = 0.0);
 
         void run() const;
