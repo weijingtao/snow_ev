@@ -35,6 +35,30 @@ namespace snow
         }
     }
 
+    endpoint::endpoint(const endpoint & rhs) {
+        memcpy(&m_addr, &rhs.m_addr, sizeof(rhs.m_addr));
+        m_valide = rhs.m_valide;
+    }
+
+    endpoint::endpoint(endpoint && rhs) {
+        memcpy(&m_addr, &rhs.m_addr, sizeof(rhs.m_addr));
+        m_valide = rhs.m_valide;
+        memset(&rhs.m_addr, 0, sizeof(rhs.m_addr));
+        rhs.m_valide = false;
+    }
+
+    void endpoint::operator=(const endpoint & rhs) {
+        memcpy(&m_addr, &rhs.m_addr, sizeof(rhs.m_addr));
+        m_valide = rhs.m_valide;
+    }
+
+    void endpoint::operator=(endpoint && rhs) {
+        memcpy(&m_addr, &rhs.m_addr, sizeof(rhs.m_addr));
+        m_valide = rhs.m_valide;
+        memset(&rhs.m_addr, 0, sizeof(rhs.m_addr));
+        rhs.m_valide = false;
+    }
+
     endpoint::operator bool() const {
         return m_valide;
     }

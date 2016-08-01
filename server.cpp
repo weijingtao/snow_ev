@@ -13,6 +13,8 @@
 
 
 namespace snow {
+    thread_local std::list<std::unique_ptr<connection>>   server::m_connections;
+
     server::server()
         : m_stop_flag(true),
           m_thread_poll(2) {
@@ -87,8 +89,18 @@ namespace snow {
         m_stop_flag = true;
     }
 
-    void server::handle_new_connection(connection &) {
+    void server::handle_new_connection(std::unique_ptr<connection>& conn) {
+        conn->set_close_handler(std::bind(&server::handle_close, this, std::placeholders::_1));
+        conn->set_pkg_spliter(std::bind(&server::pkg_check, this, std::placeholders::_1, std::placeholders::_2));
+        conn->set_dispatcher(std::bind(&server::request_dispatch, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        conn->set_timeout(m_connection_timeout);
+        conn->start();
+        auto it = m_connections.insert(m_connections.cend(), std::move(conn));
+        (*it)->set_index(it);
+    }
 
+    void server::handle_close(connection::index_type &index) {
+        m_connections.erase(index);
     }
 
     void server::check() {

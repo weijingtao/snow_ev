@@ -21,6 +21,10 @@ namespace snow
 
         explicit socket(int fd);
 
+        socket(socket&&);
+
+//        void operator=(socket&&);
+
         virtual ~socket();
 
         void set_socket_fd(int fd) {
@@ -31,15 +35,15 @@ namespace snow
             return m_fd;
         }
 
-        void set_local_endpoint(const std::shared_ptr<endpoint>& local_endpoint) {
+        void set_local_endpoint(const endpoint& local_endpoint) {
             m_local_endpoint = local_endpoint;
         }
 
-        void set_local_endpoint(std::shared_ptr<endpoint>&& local_endpoint) {
+        void set_local_endpoint(endpoint&& local_endpoint) {
             m_local_endpoint = std::move(local_endpoint);
         }
 
-        const std::shared_ptr<endpoint>& get_local_endpoint() const {
+        const endpoint& get_local_endpoint() const {
             return m_local_endpoint;
         }
 
@@ -71,10 +75,14 @@ namespace snow
 
         bool bind(const endpoint& addr);
 
+    private:
+        socket(const socket&) = delete;
+        void operator=(const socket&) = delete;
+
 
     protected:
-        int m_fd;
-        std::shared_ptr<endpoint> m_local_endpoint;
-        endpoint                  m_peer_endpoint;
+        int      m_fd;
+        endpoint m_local_endpoint;
+        endpoint m_peer_endpoint;
     };
 }

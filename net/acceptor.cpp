@@ -79,7 +79,8 @@ namespace snow {
         m_socket.accept(&sockets);
         if(m_new_connection_handle && !sockets.empty()) {
             for(auto& socket : sockets) {
-                m_new_connection_handle(connection(socket));
+                std::unique_ptr<connection> new_connection(new connection(std::move(socket)));
+                m_new_connection_handle(new_connection);
             }
         }
     }

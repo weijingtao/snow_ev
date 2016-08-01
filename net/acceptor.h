@@ -20,7 +20,7 @@
 namespace snow {
     class acceptor {
     public:
-        typedef std::function<void(connection&)> new_connection_handle_type;
+        typedef std::function<void(std::unique_ptr<connection>&)> new_connection_handle_type;
 
         acceptor(const endpoint& addr);
 

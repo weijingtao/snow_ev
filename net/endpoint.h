@@ -22,6 +22,14 @@ namespace snow
 
         endpoint(const std::string& ip, uint16_t port);
 
+        endpoint(const endpoint&);
+
+        endpoint(endpoint&&);
+
+        void operator=(const endpoint&);
+
+        void operator=(endpoint&&);
+
         operator bool() const;
 
         const struct sockaddr& sockaddr() const;
@@ -37,6 +45,6 @@ namespace snow
 
     private:
         struct sockaddr m_addr;
-        bool     m_valide;
+        bool            m_valide;
     };
 }

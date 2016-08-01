@@ -32,7 +32,9 @@ namespace snow
 
     protected:
 
-        virtual void handle_new_connection(connection&);
+        virtual void handle_new_connection(std::unique_ptr<connection>&);
+
+        virtual void handle_close(connection::index_type& index);
 
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
@@ -56,6 +58,7 @@ namespace snow
         bool                    m_stop_flag;
         std::list<acceptor>     m_acceptors;
         thread_poll             m_thread_poll;
+        static thread_local std::list<std::unique_ptr<connection>>   m_connections;
         int m_proc_num;
         int m_connection_timeout; //ms
         int m_max_connecction;

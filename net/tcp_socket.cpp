@@ -42,6 +42,9 @@ namespace snow
                 if (errno == EINTR) {
                     continue;
                 }
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    return -1;
+                }
                 return -1;
             }
         }
@@ -57,6 +60,9 @@ namespace snow
             } else {
                 if (errno == EINTR) {
                     continue;
+                }
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    return -1;
                 }
                 return -1;
             }

@@ -6,22 +6,23 @@
 
 namespace snow
 {
-    connection::connection(tcp_socket& socket)
-        : m_socket(socket) {
+    connection::connection(tcp_socket&& socket)
+        : m_socket(std::move(socket)) {
         assert(m_socket.get_socket_fd() > 0);
     }
 
     connection::~connection() {
         m_timer.cancel();
         m_io_event.disable_all();
+        handle_close();
     }
 
     void connection::start() {
-
+        m_io_event.enable_reading();
     }
 
     void connection::stop() {
-
+        m_io_event.disable_all();
     }
 
     void connection::send(const buffer& data) {
@@ -41,11 +42,12 @@ namespace snow
         if((0 == ret) || ((ret < 0) && (errno != EAGAIN && errno != EWOULDBLOCK))) {
             m_timer.cancel();
             m_io_event.disable_all();
+            handle_close();
             return;
         }
         std::size_t pkg_len = 0;
         while ((pkg_len = m_pkg_spliter(m_recv_buffer.read_index(), m_recv_buffer.readable_bytes())) > 0) {
-            m_dispatcher(buffer(m_recv_buffer.read_index(), pkg_len));
+            m_dispatcher(m_recv_buffer.read_index(), pkg_len, std::bind(&connection::send, this, std::placeholders::_1));
             m_recv_buffer.increase_read_index(pkg_len);
         }
     }
@@ -56,21 +58,16 @@ namespace snow
             m_io_event.enable_reading();
             m_io_event.enable_oneshot();
         }
-        do {
-            while((m_send_buffer.readable_bytes() > 0) && ((write_bytes = write(m_socket_fd, m_send_buffer.read_index(), m_send_buffer.readable_bytes())) > 0)) {
-                m_send_buffer.increase_read_index(write_bytes);
-            }
-            if (errno == EINTR) {
-                continue;
-            }
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                break;
-            }
-        } while(true);
     }
 
     void connection::handle_timeout() {
-        m_io_event->disable_all();
-        delete this;
+        m_io_event.disable_all();
+        handle_close();
+    }
+
+    void connection::handle_close() {
+        if(m_close_handler) {
+            m_close_handler(m_index);
+        }
     }
 }

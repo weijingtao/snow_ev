@@ -42,6 +42,10 @@ namespace snow
 
         }
 
+        event(event&&);
+
+//        void operator=(event&&);
+
 
         void run();
 
@@ -148,6 +152,10 @@ namespace snow
         }
 
     private:
+        event(const event&) = delete;
+
+        void operator=(const event&) = delete;
+
         friend class poller;
 
         void update();

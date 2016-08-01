@@ -7,6 +7,22 @@
 
 namespace snow
 {
+    event::event(event&& rhs)
+        : m_poller(std::move(rhs.m_poller)),
+          m_read_cb(std::move(rhs.m_read_cb)),
+          m_write_cb(std::move(rhs.m_write_cb)),
+          m_error_cb(std::move(rhs.m_error_cb)),
+          m_index(rhs.m_index),
+          m_socket_fd(rhs.m_socket_fd),
+          m_mask(rhs.m_mask),
+          m_ready_mask(rhs.m_ready_mask) {
+//        rhs.m_index = 0;
+        rhs.m_socket_fd = 0;
+        rhs.m_mask = 0;
+        rhs.m_ready_mask = 0;
+    }
+
+
     void event::run() {
         if(is_reading() && m_read_cb)
             m_read_cb();

@@ -37,6 +37,20 @@ namespace snow
         assert(m_fd >= 0);
     }
 
+    socket::socket(socket&& rhs)
+        : m_fd(rhs.m_fd),
+          m_local_endpoint(std::move(rhs.m_local_endpoint)),
+          m_peer_endpoint(std::move(rhs.m_peer_endpoint)) {
+        rhs.m_fd = -1;
+    }
+
+/*    void socket::operator=(socket&& rhs) {
+        m_fd = rhs.m_fd;
+//        m_local_endpoint(std::move(rhs.m_local_endpoint));
+//        m_peer_endpoint(std::move(rhs.m_peer_endpoint));
+        rhs.m_fd = -1;
+    }*/
+
     socket::~socket() {
         if(m_fd >= 0) {
             ::close(m_fd);
