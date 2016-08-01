@@ -39,7 +39,9 @@ set(FRAME_SOURCE_FILES
         server.cpp
         awakener.cpp
         config.cpp
-        session.cpp)
+        session.cpp
+        thread_poll.cpp)
 add_library(snow ${FRAME_SOURCE_FILES} ${LOGGER_SOURCE_FILES} ${EVENT_SOURCE_FILES} ${TIMER_SOURCE_FILES} ${UTILS_SOURCE_FILES} ${NET_SOURCE_FILES})
+target_link_libraries(snow pthread)
 
 add_subdirectory(samples)

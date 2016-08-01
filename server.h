@@ -9,7 +9,7 @@
 #include <list>
 #include <string>
 #include <functional>
-#include "thread_poll.hpp"
+#include "thread_poll.h"
 #include "net/buffer.h"
 #include "net/acceptor.h"
 
