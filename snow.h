@@ -5,3 +5,4 @@
 #pragma once
 
 #include "server.h"
+#include "session.h"

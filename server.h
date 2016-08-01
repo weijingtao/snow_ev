@@ -64,5 +64,15 @@ namespace snow
         int m_max_connecction;
         int m_max_request_per_second;
     };
+
+    template <typename SessionType>
+    class server_base : public server
+    {
+    public:
+        virtual void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher) {
+            auto session = std::make_shared<SessionType>();
+
+        }
+    };
 }
 

@@ -38,7 +38,8 @@ set(FRAME_SOURCE_FILES
         scheduler.cpp
         server.cpp
         awakener.cpp
-        config.cpp)
+        config.cpp
+        session.cpp)
 add_library(snow ${FRAME_SOURCE_FILES} ${LOGGER_SOURCE_FILES} ${EVENT_SOURCE_FILES} ${TIMER_SOURCE_FILES} ${UTILS_SOURCE_FILES} ${NET_SOURCE_FILES})
 
 add_subdirectory(samples)

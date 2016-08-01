@@ -4,7 +4,18 @@
 
 #include "snow.h"
 
-class echo : public snow::server
+class echo_session : public snow::session
+{
+public:
+    echo_session() = default;
+
+    virtual void process(const char* data, std::size_t len) {
+
+    }
+
+};
+
+class echo : public snow::server_base<echo_session>
 {
 public:
     virtual std::size_t pkg_check(const char* data, std::size_t len)
@@ -12,10 +23,6 @@ public:
         return len;
     }
 
-    virtual void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher)
-    {
-
-    }
 };
 
 

@@ -24,11 +24,9 @@ namespace snow {
 
         acceptor(const endpoint& addr);
 
-        ~acceptor();
+        ~acceptor() = default;
 
-        int init();
-
-        void set_new_connection_handle(new_connection_handle_type handle);
+        void set_new_connection_handle(const new_connection_handle_type& handle);
 
         bool try_lock();
 
@@ -43,10 +41,9 @@ namespace snow {
         void handle_read();
 
     private:
-        std::unique_ptr<event>     m_event;
         new_connection_handle_type m_new_connection_handle;
+        event                      m_event;
         std::mutex                 m_mutex;
         tcp_socket                 m_socket;
-        endpoint                   m_local_addr;
     };
 }
