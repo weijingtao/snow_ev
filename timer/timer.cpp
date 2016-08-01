@@ -6,22 +6,16 @@
 
 namespace snow
 {
-    timer::timer()
-        : m_interval(0.0),
-          m_repeat(false) {
+    timer::timer(const timeout_handler_type& cb, time_stamp when, std::chrono::milliseconds interval)
+        : m_timeout_handler(std::move(cb)),
+          m_expiration(when),
+          m_interval(interval) {
 
     }
 
-    timer::timer(const timer_call_back& cb, time_stamp when, double interval)
-        : m_call_back(std::move(cb)),
-          m_expiration(when),
-          m_interval(interval),
-          m_repeat(interval > 0.0)
-    { }
-
     void timer::run() const
     {
-        m_call_back();
+        m_timeout_handler();
     }
 
     timer::time_stamp timer::expiration() const  {
@@ -29,11 +23,11 @@ namespace snow
     }
 
     bool timer::repeat() const {
-        return m_repeat;
+        return (m_interval > std::chrono::milliseconds(0));
     }
 
     void timer::restart(const time_stamp& now) {
-//        m_expiration = now + std::chrono::duration_cast<std::chrono::duration<double>>(const_cast<double>(m_interval));
+        m_expiration = now + m_interval;
     }
 
     void timer::cancel() {

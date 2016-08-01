@@ -23,7 +23,7 @@ namespace snow
     /// Must be thread safe. Usually be called from other threads.
     timer_queue::timer_id timer_queue::add_timer(timer_call_back& cb,
                                     time_stamp when,
-                                    double interval) {
+                                                 std::chrono::milliseconds interval) {
         auto new_timer = std::make_shared<timer>(cb, when, interval);
         return new_timer;
     }

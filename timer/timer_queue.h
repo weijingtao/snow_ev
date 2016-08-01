@@ -32,7 +32,7 @@ namespace snow
 
         timer_id add_timer(timer_call_back& cb,
                            time_stamp when,
-                           double interval);
+                           std::chrono::milliseconds interval);
 
         void cancel(timer_id& id);
 
