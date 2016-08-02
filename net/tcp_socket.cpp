@@ -69,7 +69,31 @@ namespace snow
         } while(true);
     }
 
+    bool tcp_socket::listen() {
+        if(0 == ::listen(m_fd, 10)) {
+            return true;
+        } else {
+            SNOW_LOG_FATAL << "listen failed fd:" << m_fd << " errno:" << errno << " errmsg:" << strerror(errno);
+            return false;
+        }
+    }
+
     void tcp_socket::accept(std::vector<tcp_socket> *sockets) {
         assert(nullptr != sockets);
+        do {
+            sockaddr addr = {0};
+            socklen_t addr_len = 0;
+            int client_fd = ::accept(m_fd, &addr, &addr_len);
+            if(client_fd >= 0) {
+                sockets->emplace_back(client_fd);
+            } else {
+                if (errno == EINTR) {
+                    continue;
+                }
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    break;
+                }
+            }
+        } while(true);
     }
 }

@@ -9,14 +9,14 @@
 #include <functional>
 #include <list>
 
+
 namespace snow
 {
     enum {
         EV_NONE    = 0,
         EV_READ    = 1,
         EV_WRITE   = 1 << 1,
-        EV_TIMEOUT = 1 << 2,
-        EV_ONESHOT = 1 << 3
+        EV_ONESHOT = 1 << 2
     };
     class poller;
 
@@ -41,11 +41,6 @@ namespace snow
             m_ready_mask(EV_NONE) {
 
         }
-
-        event(event&&);
-
-//        void operator=(event&&);
-
 
         void run();
 
@@ -74,7 +69,12 @@ namespace snow
         }
 
         void set_mask(uint16_t mask) {
+            if(m_mask == mask) {
+                return;
+            }
+            auto old_mask = m_mask;
             m_mask = mask;
+            update(m_mask, old_mask);
         }
 
         uint16_t get_mask() const {
@@ -90,37 +90,44 @@ namespace snow
         }
 
         void enable_reading() {
+            auto old_mask = m_mask;
             m_mask |= EV_READ;
-            update();
+            update(m_mask, old_mask);
         }
         void disable_reading() {
+            auto old_mask = m_mask;
             m_mask &= ~EV_READ;
-            update();
+            update(m_mask, old_mask);
         }
 
         void enable_writing() {
+            auto old_mask = m_mask;
             m_mask |= EV_WRITE;
-            update();
+            update(m_mask, old_mask);
         }
 
         void disable_writing() {
+            auto old_mask = m_mask;
             m_mask &= ~EV_WRITE;
-            update();
+            update(m_mask, old_mask);
         }
 
         void enable_oneshot() {
+            auto old_mask = m_mask;
             m_mask |= EV_ONESHOT;
-            update();
+            update(m_mask, old_mask);
         }
 
         void disable_oneshot() {
+            auto old_mask = m_mask;
             m_mask &= ~EV_ONESHOT;
-            update();
+            update(m_mask, old_mask);
         }
 
         void disable_all() {
+            auto old_mask = m_mask;
             m_mask = EV_NONE;
-            update();
+            update(m_mask, old_mask);
         }
 
         bool is_reading() const {
@@ -154,7 +161,7 @@ namespace snow
 
         friend class poller;
 
-        void update();
+        void update(uint16_t new_mask, uint16_t old_mask);
 
         void set_index(const index_type& index) {
             m_index = index;

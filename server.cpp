@@ -14,8 +14,6 @@
 
 
 namespace snow {
-    thread_local std::list<std::unique_ptr<connection>>   server::m_connections;
-
     server::server()
         : m_stop_flag(true) {
 
@@ -27,9 +25,14 @@ namespace snow {
 
     int server::init(const std::string& file_name) {
         config conf(file_name);
+        m_proc_num               = conf.get_proc_num();
         m_max_connecction        = conf.get_max_connection();
         m_connection_timeout     = conf.get_connection_timeout();
         m_max_request_per_second = conf.get_max_request_per_second();
+        SNOW_LOG_DEBUG << "proc num :" << m_proc_num
+                       << " max connection:" << m_max_connecction
+                       << " connection timeout:" << m_connection_timeout
+                       << " max request per sencend:" << m_max_request_per_second;
 
         auto& addrs = conf.get_endpoints();
         for(auto& addr : addrs) {
@@ -81,10 +84,9 @@ namespace snow {
 
     void server::start() {
         m_stop_flag = false;
+        m_proc_num = 1;
         m_thread_poll.start(std::bind(&server::run, this), m_proc_num);
-        while(true) {
-            std::this_thread::sleep_for(std::chrono::seconds(1000000000));
-        }
+        m_thread_poll.join();
     }
 
     void server::stop() {
@@ -92,6 +94,7 @@ namespace snow {
     }
 
     void server::handle_new_connection(std::unique_ptr<connection>& conn) {
+        SNOW_LOG_DEBUG << "new connection fd";
         conn->set_close_handler(std::bind(&server::handle_close, this, std::placeholders::_1));
         conn->set_pkg_spliter(std::bind(&server::pkg_check, this, std::placeholders::_1, std::placeholders::_2));
         conn->set_dispatcher(std::bind(&server::request_dispatch, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -106,6 +109,7 @@ namespace snow {
     }
 
     void server::check() {
+        SNOW_LOG_DEBUG << "check acceptor num:" << m_acceptors.size();
         for (auto &acceptor : m_acceptors) {
             if (acceptor.try_lock()) {
                 acceptor.enable_event_call_back();
@@ -115,13 +119,15 @@ namespace snow {
     }
 
     void server::prepare() {
-
+        SNOW_LOG_DEBUG;
     }
 
     void server::run() {
-        while(true) {
+        while(!m_stop_flag) {
             SNOW_LOG_TRACE << "server runing";
-            scheduler::instance().start();
+            check();
+            scheduler::instance().run();
+            prepare();
         };
     }
 }

@@ -9,10 +9,12 @@
 #include <thread>
 #include <array>
 #include "event.h"
+#include "logger/logger.h"
 
 namespace snow {
 
     scheduler &scheduler::instance() {
+        SNOW_LOG_DEBUG << "thread id:" << std::this_thread::get_id();
         static thread_local scheduler scheduler_instance;
         return scheduler_instance;
     }
@@ -20,24 +22,11 @@ namespace snow {
     scheduler::scheduler()
         : m_timer_queue(&m_poller),
           m_awakener(&m_poller) {
-
+        SNOW_LOG_DEBUG << "thread id:" << std::this_thread::get_id();
     }
 
     void scheduler::wake_up() {
         m_awakener.wake_up();
-    }
-
-    void scheduler::start() {
-        if (!m_running) {
-            m_running = true;
-            run();
-        }
-    }
-
-    void scheduler::stop() {
-        if (m_running) {
-            m_running = false;
-        }
     }
 
     void scheduler::post(task_type_ptr &task) {
@@ -51,16 +40,15 @@ namespace snow {
     }
 
     void scheduler::run() {
-        while (m_running) {
-            if(m_cb_before_loop)
-                m_cb_before_loop();
-            std::vector<std::shared_ptr<event>> active_events;
-            m_poller.poll(&active_events, 10);
-            for (auto& event : active_events) {
-                event->run();
-            }
-            if(m_cb_after_loop)
-                m_cb_after_loop();
+        /*if(m_cb_before_loop)
+            m_cb_before_loop();*/
+        std::vector<event*> active_events;
+        m_poller.poll(&active_events, 10000);
+        for (auto& event : active_events) {
+            SNOW_LOG_DEBUG << "fd:" << event->get_socket_fd() << " mask:" << event->get_mask() << " ready_mask:" << event->get_ready_mask();
+            event->run();
         }
+        /*if(m_cb_after_loop)
+            m_cb_after_loop();*/
     }
 }

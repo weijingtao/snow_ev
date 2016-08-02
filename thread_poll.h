@@ -15,6 +15,8 @@ namespace snow
 
         void start(runnable_type task, std::size_t thread_count = 1);
 
+        void join();
+
     private:
         std::vector<std::thread> m_threads;
     };

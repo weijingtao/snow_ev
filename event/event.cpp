@@ -3,34 +3,35 @@
 //
 
 #include "event.h"
-
+#include "../scheduler.h"
+#include "../logger/logger.h"
 
 namespace snow
 {
-    event::event(event&& rhs)
-        : m_poller(std::move(rhs.m_poller)),
-          m_read_cb(std::move(rhs.m_read_cb)),
-          m_write_cb(std::move(rhs.m_write_cb)),
-          m_error_cb(std::move(rhs.m_error_cb)),
-          m_index(rhs.m_index),
-          m_socket_fd(rhs.m_socket_fd),
-          m_mask(rhs.m_mask),
-          m_ready_mask(rhs.m_ready_mask) {
-//        rhs.m_id = 0;
-        rhs.m_socket_fd = 0;
-        rhs.m_mask = 0;
-        rhs.m_ready_mask = 0;
-    }
-
-
     void event::run() {
-        if(is_reading() && m_read_cb)
+        if(is_readable() && m_read_cb)
             m_read_cb();
         if(is_writeable() && m_write_cb)
             m_write_cb();
+        m_ready_mask = 0;
     }
 
-    void event::update() {
-
+    void event::update(uint16_t new_mask, uint16_t old_mask) {
+        if(m_socket_fd < 0) {
+            SNOW_LOG_DEBUG;
+        }
+        if(old_mask == 0 && new_mask != 0) {
+            SNOW_LOG_DEBUG << "add new event fd:" << m_socket_fd << " interest event:" << m_mask;
+//            scheduler::instance().get_poller().add_event(this);
+            m_poller->add_event(this);
+        } else if(old_mask != 0 && new_mask == 0) {
+            SNOW_LOG_DEBUG << "del event fd:" << m_socket_fd << " interest event:" << m_mask;
+//            scheduler::instance().get_poller().del_event(this);
+            m_poller->del_event(this);
+        } else {
+            SNOW_LOG_DEBUG << "mod event fd:" << m_socket_fd << " interest event:" << m_mask;
+//            scheduler::instance().get_poller().mod_event(this);
+            m_poller->mod_event(this);
+        }
     }
 }

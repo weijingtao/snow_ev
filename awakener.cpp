@@ -19,6 +19,7 @@ namespace snow
             ::shutdown(m_socket_pair[1], ::SHUT_WR);
 
             m_event.set_read_cb(std::bind(&awakener::handle_read, this));
+            m_event.set_socket_fd(m_socket_pair[1]);
             m_event.enable_reading();
         }
     }

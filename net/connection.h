@@ -16,8 +16,9 @@
 
 namespace snow
 {
-    class request;
     class buffer;
+    class scheduler;
+
     class connection
     {
     public:
@@ -29,7 +30,7 @@ namespace snow
         typedef std::function<std::size_t(const char*const, std::size_t)> pkg_split_type;
 
 
-        explicit connection(tcp_socket&& socket);
+        connection(tcp_socket&& socket);
 
         ~connection();
 

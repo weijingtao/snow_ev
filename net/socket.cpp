@@ -87,6 +87,11 @@ namespace snow
     }
 
     bool socket::bind(const endpoint &addr) {
-        return false;
+        if(0 == ::bind(m_fd, &addr.sockaddr(), sizeof(addr.sockaddr()))) {
+            return true;
+        } else {
+            SNOW_LOG_FATAL << "bind failed fd:" << m_fd << " errno:" << errno << " errmsg:" << strerror(errno);
+            return false;
+        }
     }
 }

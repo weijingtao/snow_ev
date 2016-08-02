@@ -22,11 +22,7 @@ namespace snow {
 
         static scheduler &instance();
 
-        scheduler();
-
-        void start();
-
-        void stop();
+        void run();
 
         void post(task_type_ptr &task);
 
@@ -51,9 +47,13 @@ namespace snow {
 
     private:
 
-        void wake_up();
+        scheduler();
 
-        void run();
+        scheduler(const scheduler&) = delete;
+
+        void operator=(const scheduler&) = delete;
+
+        void wake_up();
 
     private:
         poller      m_poller;

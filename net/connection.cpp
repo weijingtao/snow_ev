@@ -3,6 +3,7 @@
 //
 
 #include "connection.h"
+#include "../scheduler.h"
 
 namespace snow
 {

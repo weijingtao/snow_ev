@@ -7,11 +7,13 @@
 //
 #include "timer_queue.h"
 #include <cstring>
+#include "../logger/logger.h"
 
 namespace snow
 {
     timer_queue::timer_queue(poller* poller)
       : m_timer_fd(poller) {
+        SNOW_LOG_DEBUG;
         m_timer_fd.init();
         m_timer_fd.set_timeout_cb(std::bind(&timer_queue::handle_timeout, this));
     }

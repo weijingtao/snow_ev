@@ -19,9 +19,7 @@ namespace snow
 
         virtual std::size_t write(buffer& buf);
 
-        bool listen() {
-            return false;
-        }
+        bool listen();
 
         void accept(std::vector<tcp_socket>* sockets);
     };

@@ -11,6 +11,8 @@
 
 namespace snow
 {
+    class scheduler;
+
     class timer
     {
     public:

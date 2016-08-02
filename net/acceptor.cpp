@@ -18,9 +18,11 @@ namespace snow {
         : m_socket(::socket(addr.is_v4() ? AF_INET : AF_INET6, SOCK_STREAM, 0)) {
         m_socket.enable_nonblock();
         m_socket.enable_reuse_addr();
-        m_socket.bind(addr);
-        m_socket.listen();
+        assert(m_socket.bind(addr));
+        assert(m_socket.listen());
         m_event.set_read_cb(std::bind(&acceptor::handle_read, this));
+        m_event.set_socket_fd(m_socket.get_socket_fd());
+        SNOW_LOG_DEBUG << "acceptor socket fd:" << m_socket.get_socket_fd();
     }
 
     void acceptor::set_new_connection_handle(const new_connection_handle_type& handle) {
@@ -46,6 +48,7 @@ namespace snow {
         m_socket.accept(&sockets);
         if(m_new_connection_handle && !sockets.empty()) {
             for(auto& socket : sockets) {
+                SNOW_LOG_DEBUG << "new socket fd:" << socket.get_socket_fd();
                 std::unique_ptr<connection> new_connection(new connection(std::move(socket)));
                 m_new_connection_handle(new_connection);
             }

@@ -34,6 +34,10 @@ namespace snow
         void reset(const time_stamp& expiration);
 
     private:
+        timer_fd(const timer_fd&) = delete;
+        void operator=(const timer_fd&) = delete;
+
+    private:
         event   m_event;
         time_out_cb m_cb;
         int     m_fd;

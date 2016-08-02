@@ -5,6 +5,7 @@
 #include "timer_fd.h"
 #include <sys/timerfd.h>
 #include <cstring>
+#include <cassert>
 #include "logger/logger.h"
 
 
@@ -25,8 +26,8 @@ namespace snow
     int timer_fd::init() {
         m_fd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
         SNOW_LOG_DEBUG << "timer fd :" << m_fd;
-        if(m_fd < 0)
-            return -1;
+        assert(m_fd > 0);
+        m_event.set_socket_fd(m_fd);
         m_event.set_read_cb(std::bind(&timer_fd::handle_read, this));
         m_event.enable_reading();
         return 0;

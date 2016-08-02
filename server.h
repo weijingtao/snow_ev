@@ -10,6 +10,7 @@
 #include <string>
 #include <functional>
 #include "thread_poll.h"
+#include "scheduler.h"
 #include "net/buffer.h"
 #include "net/acceptor.h"
 
@@ -32,15 +33,15 @@ namespace snow
 
     protected:
 
-        virtual void handle_new_connection(std::unique_ptr<connection>&);
-
-        virtual void handle_close(connection::index_type& index);
-
         virtual std::size_t pkg_check(const char* data, std::size_t len) = 0;
 
         virtual void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher) = 0;
 
     private:
+        void handle_new_connection(std::unique_ptr<connection>&);
+
+        void handle_close(connection::index_type& index);
+
         void check();
 
         void prepare();
@@ -58,7 +59,8 @@ namespace snow
         bool                    m_stop_flag;
         std::list<acceptor>     m_acceptors;
         thread_poll             m_thread_poll;
-        static thread_local std::list<std::unique_ptr<connection>>   m_connections;
+        std::list<scheduler>    m_schedulers;
+        std::list<std::unique_ptr<connection>>   m_connections;
         int m_proc_num;
         int m_connection_timeout; //ms
         int m_max_connecction;
