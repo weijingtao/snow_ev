@@ -8,4 +8,4 @@ link_directories(../bin/Debug)
 link_directories(../../yaml-cpp/build/)
 
 add_executable(echo echo.cpp)
-target_link_libraries(echo snow snow_net snow_timer snow_event snow_logger snow_utils yaml-cpp)
+target_link_libraries(echo snow yaml-cpp)

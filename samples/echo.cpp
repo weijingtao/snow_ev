@@ -2,6 +2,7 @@
 // Created by weitao on 7/17/16.
 //
 
+#include <iostream>
 #include "snow.h"
 
 class echo_session : public snow::session
@@ -10,7 +11,7 @@ public:
     echo_session() = default;
 
     virtual void process(const char* data, std::size_t len) {
-
+        std::cout << data << std::endl;
     }
 
 };
@@ -20,6 +21,7 @@ class echo : public snow::server_base<echo_session>
 public:
     virtual std::size_t pkg_check(const char* data, std::size_t len)
     {
+        std::cout << "len:" << len << std::endl;
         return len;
     }
 

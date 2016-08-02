@@ -16,7 +16,7 @@ namespace snow
           m_socket_fd(rhs.m_socket_fd),
           m_mask(rhs.m_mask),
           m_ready_mask(rhs.m_ready_mask) {
-//        rhs.m_index = 0;
+//        rhs.m_id = 0;
         rhs.m_socket_fd = 0;
         rhs.m_mask = 0;
         rhs.m_ready_mask = 0;

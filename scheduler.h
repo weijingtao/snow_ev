@@ -32,8 +32,12 @@ namespace snow {
 
         void spawn(task_type_ptr &task);
 
-        std::shared_ptr<poller> get_poller() {
+        poller& get_poller() {
             return  m_poller;
+        }
+
+        timer_queue& get_timer_queue() {
+            return m_timer_queue;
         }
 
         void set_call_back_before_loop(call_back_before_loop_type cb) {
@@ -52,9 +56,9 @@ namespace snow {
         void run();
 
     private:
-        std::shared_ptr<poller>      m_poller;
-        std::unique_ptr<timer_queue> m_timer_queue;
-        std::unique_ptr<awakener>    m_awakener;
+        poller      m_poller;
+        timer_queue m_timer_queue;
+        awakener    m_awakener;
         call_back_before_loop_type   m_cb_before_loop;
         call_back_after_loop_type    m_cb_after_loop;
         std::deque<std::unique_ptr<task_type>> m_task_queue;

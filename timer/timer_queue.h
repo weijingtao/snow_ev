@@ -14,36 +14,37 @@
 #include <iterator>
 #include "timer.h"
 #include "timer_fd.h"
+#include "event/poller.h"
 
 namespace snow
 {
     class poller;
     class timer_queue
     {
+        class timer_comp
+        {
+        public:
+            bool operator()(const std::reference_wrapper<timer>& lhs, const std::reference_wrapper<timer>& rhs) {
+                return (lhs.get() < rhs.get());
+            }
+        };
     public:
         typedef std::chrono::steady_clock::time_point time_stamp;
         typedef std::function<void()>                 timer_call_back;
-        typedef std::shared_ptr<timer>                timer_id;
-        typedef std::pair<time_stamp, std::shared_ptr<timer>> entry;
-        typedef std::set<entry>                               timer_set;
+        typedef std::reference_wrapper<timer>         entry;
+        typedef std::set<entry, timer_comp>           timer_set;
+        typedef timer_set::iterator                   timer_id;
 
 
-        explicit timer_queue(std::shared_ptr<poller>& poller);
+        explicit timer_queue(poller* poller);
 
-        timer_id add_timer(timer_call_back& cb,
-                           time_stamp when,
-                           std::chrono::milliseconds interval);
+        timer_id add_timer(const entry& timer);
 
         void cancel(timer_id& id);
 
     private:
         timer_queue(const timer_queue&) = delete;
         void operator=(const timer_queue&) = delete;
-
-
-
-    private:
-
 
         void handle_timeout();
 
@@ -52,7 +53,7 @@ namespace snow
 
         void reset(std::vector<entry>& expired, const time_stamp& now);
 
-        bool insert(std::shared_ptr<timer>& timer);
+        bool insert(entry& timer);
 
     private:
         timer_fd  m_timer_fd;

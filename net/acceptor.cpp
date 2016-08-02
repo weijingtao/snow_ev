@@ -36,7 +36,7 @@ namespace snow {
     }
 
     void acceptor::enable_event_call_back() {
-        m_event.set_poller(scheduler::instance().get_poller());
+        m_event.set_poller(&scheduler::instance().get_poller());
         m_event.enable_reading();
         m_event.enable_oneshot();
     }

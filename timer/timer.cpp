@@ -3,6 +3,8 @@
 //
 
 #include "timer.h"
+#include <functional>
+#include "../scheduler.h"
 
 namespace snow
 {
@@ -10,12 +12,18 @@ namespace snow
         : m_timeout_handler(std::move(cb)),
           m_expiration(when),
           m_interval(interval) {
+        m_id = scheduler::instance().get_timer_queue().add_timer(std::ref(*this));
+    }
 
+    void timer::start() {
+        m_id = scheduler::instance().get_timer_queue().add_timer(std::ref(*this));
     }
 
     void timer::run() const
     {
-        m_timeout_handler();
+        if(m_timeout_handler) {
+            m_timeout_handler();
+        }
     }
 
     timer::time_stamp timer::expiration() const  {
@@ -31,6 +39,10 @@ namespace snow
     }
 
     void timer::cancel() {
+        scheduler::instance().get_timer_queue().cancel(m_id);
+    }
 
+    bool timer::operator<(const timer& rhs) {
+        return (this->m_expiration < rhs.m_expiration);
     }
 }

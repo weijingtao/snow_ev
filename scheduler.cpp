@@ -18,14 +18,13 @@ namespace snow {
     }
 
     scheduler::scheduler()
-        : m_poller(new poller),
-          m_timer_queue(new timer_queue(m_poller)),
-          m_awakener(new awakener(m_poller)) {
+        : m_timer_queue(&m_poller),
+          m_awakener(&m_poller) {
 
     }
 
     void scheduler::wake_up() {
-        m_awakener->wake_up();
+        m_awakener.wake_up();
     }
 
     void scheduler::start() {
@@ -56,7 +55,7 @@ namespace snow {
             if(m_cb_before_loop)
                 m_cb_before_loop();
             std::vector<std::shared_ptr<event>> active_events;
-            m_poller->poll(&active_events, 10);
+            m_poller.poll(&active_events, 10);
             for (auto& event : active_events) {
                 event->run();
             }

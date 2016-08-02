@@ -19,7 +19,7 @@ namespace snow
         typedef std::chrono::steady_clock::time_point time_stamp;
         typedef std::function<void(void)> time_out_cb;
 
-        timer_fd(std::shared_ptr<poller>& poller1);
+        timer_fd(poller* poller1);
 
         ~timer_fd();
 
@@ -27,11 +27,11 @@ namespace snow
 
         void set_timeout_cb(time_out_cb cb);
 
-        timespec how_much_time_from_now(time_stamp& when);
+        timespec how_much_time_from_now(const time_stamp& when);
 
         void handle_read();
 
-        void reset(time_stamp& expiration);
+        void reset(const time_stamp& expiration);
 
     private:
         event   m_event;
