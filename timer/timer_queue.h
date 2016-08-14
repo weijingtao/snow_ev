@@ -15,6 +15,7 @@
 #include "timer.h"
 #include "timer_fd.h"
 #include "event/poller.h"
+#include "../logger/logger.h"
 
 namespace snow
 {
@@ -25,7 +26,8 @@ namespace snow
         {
         public:
             bool operator()(const std::reference_wrapper<timer>& lhs, const std::reference_wrapper<timer>& rhs) {
-                return (lhs.get() < rhs.get());
+                SNOW_LOG_DEBUG << "lhs " << &lhs.get() << " rhs " << &rhs.get();
+                return (&lhs.get() < &rhs.get());
             }
         };
     public:

@@ -8,6 +8,7 @@
 #include <functional>
 #include "timer/timer.h"
 #include "net/buffer.h"
+#include "logger/logger.h"
 
 namespace snow
 {
@@ -25,6 +26,7 @@ namespace snow
         }
 
         void send_to_client(const char* data, std::size_t len) {
+            SNOW_LOG_DEBUG << "send to client bytes " << len;
             if(m_response_handler) {
                 m_response_handler(buffer(data, len));
             }

@@ -11,7 +11,8 @@ public:
     echo_session() = default;
 
     virtual void process(const char* data, std::size_t len) {
-        std::cout << data << std::endl;
+//        std::cout << data << std::endl;
+        send_to_client(data, len);
     }
 
 };
@@ -21,7 +22,7 @@ class echo : public snow::server_base<echo_session>
 public:
     virtual std::size_t pkg_check(const char* data, std::size_t len)
     {
-        std::cout << "len:" << len << std::endl;
+//        std::cout << "len:" << len << std::endl;
         return len;
     }
 

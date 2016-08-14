@@ -117,7 +117,7 @@ namespace snow
         if(active_events < 0) {
             SNOW_LOG_FATAL << "epoll fd " << m_epoll_fd << " errno:" << errno << ", errmsg " << strerror(errno);
         }
-        std::cout << "active_events : " << active_events << std::endl;
+//        std::cout << "active_events : " << active_events << std::endl;
         if (active_events > 0) {
             for (int index = 0; index < active_events; ++index) {
                 SNOW_LOG_DEBUG << "EPOLLIN:" << EPOLLIN << " EPOLLOUT:" << EPOLLOUT << " EPOLLERR:" << EPOLLERR << " EPOLLHUP:" << EPOLLHUP;

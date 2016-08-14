@@ -70,7 +70,7 @@ namespace snow {
                 m_acceptors.emplace_back(bind_addr);
             }
         }
-        endpoint bind_addr("127.0.0.1", 50000);
+        endpoint bind_addr("192.168.89.134", 50000);
         if(bind_addr) {
             m_acceptors.emplace_back(bind_addr);
         }
@@ -84,7 +84,7 @@ namespace snow {
 
     void server::start() {
         m_stop_flag = false;
-        m_proc_num = 1;
+        m_proc_num = 4;
         m_thread_poll.start(std::bind(&server::run, this), m_proc_num);
         m_thread_poll.join();
     }
@@ -113,8 +113,8 @@ namespace snow {
         SNOW_LOG_DEBUG << "check acceptor num:" << m_acceptors.size();
         for (auto &acceptor : m_acceptors) {
             if (acceptor.try_lock()) {
+                SNOW_LOG_FATAL << "thread[" << std::this_thread::get_id() << "] get the mutex";
                 acceptor.enable_event_call_back();
-//                acceptor.unlock();
             }
         }
     }
@@ -125,7 +125,7 @@ namespace snow {
 
     void server::run() {
         while(!m_stop_flag) {
-            SNOW_LOG_TRACE << "server runing";
+            SNOW_LOG_TRACE << "thread[" << std::this_thread::get_id() << "] server runing";
             check();
             scheduler::instance().run();
             prepare();

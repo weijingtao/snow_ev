@@ -20,6 +20,7 @@ namespace snow
           m_read_index(0),
           m_write_index(0) {
         std::copy(buffer, buffer + len, m_buffer.get());
+        m_write_index += len;
     }
 
     //TODO

@@ -3,6 +3,7 @@
 //
 
 #include "connection.h"
+#include <thread>
 #include "../scheduler.h"
 
 namespace snow
@@ -67,6 +68,7 @@ namespace snow
     }
 
     void connection::handle_timeout() {
+        SNOW_LOG_DEBUG << "thread[" << std::this_thread::get_id() << "] socket[" << m_socket.get_socket_fd() << "] time out";
         m_io_event.disable_all();
         m_timer.cancel();
         handle_close();

@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <cassert>
 #include <cstring>
+#include <thread>
 #include "scheduler.h"
 #include "logger/logger.h"
 
@@ -47,6 +48,7 @@ namespace snow {
     void acceptor::handle_read() {
         std::vector<tcp_socket> sockets;
         m_socket.accept(&sockets);
+        unlock();
         if(m_new_connection_handle && !sockets.empty()) {
             for(auto& socket : sockets) {
                 SNOW_LOG_DEBUG << "new socket fd:" << socket.get_socket_fd();
@@ -54,6 +56,5 @@ namespace snow {
                 m_new_connection_handle(new_connection);
             }
         }
-        unlock();
     }
 }

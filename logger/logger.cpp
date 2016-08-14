@@ -65,6 +65,8 @@ namespace snow
     void logger::write(log_level level, const std::string &str) {
         std::stringstream log_message;
         log_message << "level[" << int(level) << "] " << str << std::endl;
+        if(level < log_level::FATAL)
+            return;
         m_log_writer(log_message.str());
     }
 

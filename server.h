@@ -73,8 +73,14 @@ namespace snow
     public:
         virtual void request_dispatch(const char* req_data, std::size_t req_len, response_dispatch_type rsp_dispatcher) {
             auto session = std::make_shared<SessionType>();
-
+            session->set_response_handler(rsp_dispatcher);
+            session->process(req_data, req_len);
+//            m_sessions.push_back(session);
         }
+
+    private:
+        typedef std::shared_ptr<SessionType> session_ptr;
+        std::vector<session_ptr> m_sessions;
     };
 }
 
