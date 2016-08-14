@@ -30,13 +30,16 @@ namespace snow
         typedef std::set<entry, timer_comp>           timer_set;
         typedef timer_set::iterator                   timer_id;
 
-        timer() = default;
+        timer()
+            : m_running(false) {
+
+        }
 
         timer(const timeout_handler_type& cb, time_stamp when, std::chrono::milliseconds interval);
 
         void start();
 
-        void run() const;
+        void run();
 
         void set_timeout_handler(const timeout_handler_type& handler) {
             m_timeout_handler = handler;
@@ -73,5 +76,6 @@ namespace snow
         time_stamp                m_expiration;
         std::chrono::milliseconds m_interval;
         timer_id                  m_id;
+        bool                      m_running;
     };
 }

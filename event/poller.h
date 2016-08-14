@@ -20,8 +20,6 @@ namespace snow
     class poller
     {
     public:
-        typedef std::list<std::shared_ptr<event>> event_list;
-        typedef event_list::const_iterator        event_id;
 
         poller();
 
@@ -42,7 +40,6 @@ namespace snow
         void operator=(const poller&) = delete;
 
     private:
-        event_list               m_events;
         std::vector<epoll_event> m_active_events;
         std::size_t              m_active_event_count;
         int                      m_epoll_fd;

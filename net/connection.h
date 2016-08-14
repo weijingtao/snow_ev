@@ -55,7 +55,7 @@ namespace snow
         }
 
         void set_timeout(std::size_t timeout) {
-            m_timeout = timeout;
+            m_timer.set_interval(std::chrono::milliseconds(timeout));
         }
 
     private:
@@ -82,6 +82,5 @@ namespace snow
         buffer                 m_send_buffer;
         index_type             m_index;
         close_handle_type      m_close_handler;
-        std::size_t            m_timeout;
     };
 }

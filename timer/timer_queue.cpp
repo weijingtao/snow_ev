@@ -37,7 +37,10 @@ namespace snow
     void timer_queue::cancel(timer_id& id) {
         if(id == m_timers.begin()) {
             m_timers.erase(id);
-            m_timer_fd.reset(m_timers.cbegin()->get().expiration());
+            if(!m_timers.empty())
+                m_timer_fd.reset(m_timers.cbegin()->get().expiration());
+//            else
+//                m_timer_fd.reset();
         } else {
             m_timers.erase(id);
         }

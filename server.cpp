@@ -99,9 +99,10 @@ namespace snow {
         conn->set_pkg_spliter(std::bind(&server::pkg_check, this, std::placeholders::_1, std::placeholders::_2));
         conn->set_dispatcher(std::bind(&server::request_dispatch, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         conn->set_timeout(m_connection_timeout);
-        conn->start();
+//        conn->start();
         auto it = m_connections.insert(m_connections.cend(), std::move(conn));
         (*it)->set_index(it);
+        (*it)->start();
     }
 
     void server::handle_close(connection::index_type &index) {
@@ -113,7 +114,7 @@ namespace snow {
         for (auto &acceptor : m_acceptors) {
             if (acceptor.try_lock()) {
                 acceptor.enable_event_call_back();
-                acceptor.unlock();
+//                acceptor.unlock();
             }
         }
     }

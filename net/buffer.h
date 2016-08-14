@@ -51,10 +51,12 @@ namespace snow
 
         void increase_read_index(std::size_t size) {
             m_read_index += size;
+            SNOW_LOG_DEBUG << "size " << size << " m_read_index " << m_read_index;
         }
 
         void increase_write_index(std::size_t size) {
             m_write_index += size;
+            SNOW_LOG_DEBUG << "size " << size << " m_read_index " << m_write_index;
         }
 
         void append(const char * data, std::size_t len);

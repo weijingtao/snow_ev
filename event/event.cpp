@@ -20,6 +20,8 @@ namespace snow
         if(m_socket_fd < 0) {
             SNOW_LOG_DEBUG;
         }
+        if(new_mask == 0)
+            SNOW_LOG_FATAL;
         if(old_mask == 0 && new_mask != 0) {
             SNOW_LOG_DEBUG << "add new event fd:" << m_socket_fd << " interest event:" << m_mask;
 //            scheduler::instance().get_poller().add_event(this);

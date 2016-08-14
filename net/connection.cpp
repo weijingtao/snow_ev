@@ -15,11 +15,16 @@ namespace snow
     connection::~connection() {
         m_timer.cancel();
         m_io_event.disable_all();
-        handle_close();
     }
 
     void connection::start() {
+        m_io_event.set_poller(&scheduler::instance().get_poller());
+        m_io_event.set_socket_fd(m_socket.get_socket_fd());
+        m_io_event.set_read_cb(std::bind(&connection::handle_read, this));
+        SNOW_LOG_DEBUG << "conn addr " << this << " event addr " << &m_io_event;
         m_io_event.enable_reading();
+        m_timer.set_timeout_handler(std::bind(&connection::handle_timeout, this));
+        m_timer.start();
     }
 
     void connection::stop() {
@@ -63,6 +68,7 @@ namespace snow
 
     void connection::handle_timeout() {
         m_io_event.disable_all();
+        m_timer.cancel();
         handle_close();
     }
 

@@ -30,6 +30,7 @@ namespace snow {
     }
 
     bool acceptor::try_lock() {
+        SNOW_LOG_DEBUG << "acceptor event addr " << &m_event;
         return m_mutex.try_lock();
     }
 
@@ -53,5 +54,6 @@ namespace snow {
                 m_new_connection_handle(new_connection);
             }
         }
+        unlock();
     }
 }

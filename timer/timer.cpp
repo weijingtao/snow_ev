@@ -16,13 +16,17 @@ namespace snow
     }
 
     void timer::start() {
-        m_id = scheduler::instance().get_timer_queue().add_timer(std::ref(*this));
+        if(!m_running) {
+            m_id = scheduler::instance().get_timer_queue().add_timer(std::ref(*this));
+            m_running = true;
+        }
     }
 
-    void timer::run() const
+    void timer::run()
     {
         if(m_timeout_handler) {
             m_timeout_handler();
+            m_running = false;
         }
     }
 
@@ -39,7 +43,10 @@ namespace snow
     }
 
     void timer::cancel() {
-        scheduler::instance().get_timer_queue().cancel(m_id);
+        if(m_running) {
+            scheduler::instance().get_timer_queue().cancel(m_id);
+            m_running = false;
+        }
     }
 
     bool timer::operator<(const timer& rhs) {

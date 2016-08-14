@@ -125,6 +125,8 @@ namespace snow
         }
 
         void disable_all() {
+            if(m_mask == EV_NONE)
+                return;
             auto old_mask = m_mask;
             m_mask = EV_NONE;
             update(m_mask, old_mask);

@@ -29,16 +29,16 @@ namespace snow
             read_bytes = ::readv(m_fd, iov, sizeof(iov)/sizeof(iovec));
             if(0 == read_bytes) {
                 return 0;
-            }
-            if (read_bytes > 0) {
-                std::size_t writeable_bytes = buf->writeable_bytes();
-                buf->increase_write_index(buf->writeable_bytes());
-                if(read_bytes > buf->writeable_bytes()) {
+            } else if (read_bytes > 0) {
+                if(read_bytes <= buf->writeable_bytes()) {
+                    buf->increase_write_index(read_bytes);
+                } else {
+                    std::size_t writeable_bytes = buf->writeable_bytes();
+                    buf->increase_write_index(buf->writeable_bytes());
                     buf->append(common_buffer, read_bytes - writeable_bytes);
                 }
                 return read_bytes;
-            }
-            else {
+            } else {
                 if (errno == EINTR) {
                     continue;
                 }

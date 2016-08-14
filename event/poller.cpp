@@ -31,34 +31,42 @@ namespace snow
     }
 
     int poller::add_event(event* ev) {
-        SNOW_LOG_DEBUG;
+        SNOW_LOG_DEBUG << "add socket fd " << ev->get_socket_fd() << " event addr " << ev;
         if(ev->get_socket_fd() < 0) {
             return -1;
         }
+        SNOW_LOG_DEBUG;
         if(ev->is_none_event()) {
             return -1;
         }
+        SNOW_LOG_DEBUG;
         struct epoll_event ev_item;
         std::memset(&ev_item, 0, sizeof ev_item);
-        uint32_t mask = 0;
+        SNOW_LOG_DEBUG;
         if (ev->is_reading())
             ev_item.events |= ::EPOLLIN;
+        SNOW_LOG_DEBUG;
         if (ev->is_writing())
             ev_item.events |= ::EPOLLOUT;
+        SNOW_LOG_DEBUG;
         if (ev->is_oneshot())
             ev_item.events |= ::EPOLLONESHOT;
+        SNOW_LOG_DEBUG;
         ev_item.data.ptr = ev;
-
+        SNOW_LOG_DEBUG << "EPOLL_CTL_ADD mask " << ev_item.events;
         if (epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, ev->get_socket_fd(), &ev_item) == 0) {
 //            auto it = m_events.insert(m_events.cbegin(), event);
 //            event->set_index(it);
+            SNOW_LOG_DEBUG << "socket fd " << ev->get_socket_fd() << " add event success";
             return 0;
         } else {
+            SNOW_LOG_ERROR << "socket fd " << ev->get_socket_fd() << " add event success";
             return -1;
         }
     }
 
     int poller::mod_event(event* ev) {
+        SNOW_LOG_DEBUG << "mod socket fd " << ev->get_socket_fd() << " event addr " << ev;
         if(ev->get_socket_fd() < 0) {
             return -1;
         }
@@ -67,7 +75,6 @@ namespace snow
         }
         struct epoll_event ev_item;
         std::memset(&ev_item, 0, sizeof ev_item);
-        uint32_t mask = 0;
         if (ev->is_reading())
             ev_item.events |= ::EPOLLIN;
         if (ev->is_writing())
@@ -75,7 +82,7 @@ namespace snow
         if (ev->is_oneshot())
             ev_item.events |= ::EPOLLONESHOT;
         ev_item.data.ptr = ev;
-
+        SNOW_LOG_DEBUG << "EPOLL_CTL_MOD mask " << ev_item.events;
         if (epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, ev->get_socket_fd(), &ev_item) == 0) {
             return 0;
         } else {
@@ -85,6 +92,7 @@ namespace snow
 
 
     int poller::del_event(event* ev) {
+        SNOW_LOG_DEBUG << "del socket fd " << ev->get_socket_fd() << " event addr " << ev;
         if(ev->get_socket_fd() < 0) {
             return -1;
         }
@@ -95,7 +103,6 @@ namespace snow
         std::memset(&ev_item, 0, sizeof ev_item);
         ev_item.data.ptr = ev;
         if (epoll_ctl(m_epoll_fd, EPOLL_CTL_DEL, ev->get_socket_fd(), &ev_item) == 0) {
-            m_events.erase(ev->get_index());
             return 0;
         } else {
             return -1;

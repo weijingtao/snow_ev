@@ -43,7 +43,7 @@ namespace snow {
         /*if(m_cb_before_loop)
             m_cb_before_loop();*/
         std::vector<event*> active_events;
-        m_poller.poll(&active_events, 10000);
+        m_poller.poll(&active_events, 1000000);
         for (auto& event : active_events) {
             SNOW_LOG_DEBUG << "fd:" << event->get_socket_fd() << " mask:" << event->get_mask() << " ready_mask:" << event->get_ready_mask();
             event->run();
