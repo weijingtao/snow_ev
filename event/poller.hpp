@@ -85,22 +85,25 @@ namespace snow
             if(EV_NONE == mark || EV_NONE == m_events[fd].get_mark()) {
                 return -2;
             }
+            struct epoll_event ev_item{0};
+            ev_item.fd = fd;
             uint16_t new_mark = mark & ~m_events[fd].get_mark();
-            if(m_events[fd].get_mark() & EV_READ && !(new_mark & EV_NONE)) {
-                m_events[fd].set_read_cb(event::EMPTY_EVENT_HANDLER);
-            }
-            if(m_events[fd].get_mark() & EV_WRITE && !(new_mark & EV_WRITE)) {
-                m_events[fd].set_write_cb(event::EMPTY_EVENT_HANDLER);
-            }
-
             int op = EPOLL_CTL_MOD;
             if(new_mark & (EV_READ | EV_WRITE)) {
                 m_events[fd].clear();
                 op = EPOLL_CTL_DEL;
+            } else {
+                if(m_events[fd].get_mark() & EV_READ && !(new_mark & EV_NONE)) {
+                    m_events[fd].set_read_cb(event::EMPTY_EVENT_HANDLER);
+                }
+                if(m_events[fd].get_mark() & EV_WRITE && !(new_mark & EV_WRITE)) {
+                    m_events[fd].set_write_cb(event::EMPTY_EVENT_HANDLER);
+                }
+                if (m_events[fd].get_mark() & EV_READ) { ev_item.events |= ::EPOLLIN; }
+                if (m_events[fd].get_mark() & EV_WRITE) { ev_item.events |= ::EPOLLOUT; }
+                if (m_events[fd].get_mark() & EV_ONESHOT) { ev_item.events |= ::EPOLLONESHOT; }
             }
 
-            struct epoll_event ev_item{0};
-            ev_item.fd = fd;
             if (::epoll_ctl(m_epoll_fd, op, fd, &ev_item) == 0) {
                 SNOW_LOG_DEBUG << "socket fd " << ev->get_socket_fd() << " op " << op << " event " << ev_item.events << " del event success";
                 return 0;
@@ -117,21 +120,19 @@ namespace snow
             int active_events = ::epoll_wait(m_epoll_fd, &events[0], events.size(), time_out);
             if(active_events < 0) {
                 SNOW_LOG_FATAL << "epoll fd " << m_epoll_fd << " errno:" << errno << ", errmsg " << strerror(errno);
+                return -1;
             }
-//        std::cout << "active_events : " << active_events << std::endl;
-            if (active_events > 0) {
-                for (int index = 0; index < active_events; ++index) {
-                    SNOW_LOG_DEBUG << "EPOLLIN:" << EPOLLIN << " EPOLLOUT:" << EPOLLOUT << " EPOLLERR:" << EPOLLERR << " EPOLLHUP:" << EPOLLHUP;
-                    SNOW_LOG_DEBUG << "epoll event:" << events[index].events;
-                    if (events[index].events & EPOLLIN) {
-                        ready_events->emplace_back(std::bind(m_events[events[index].fd].get_read_cb(), EV_READ));
-                    }
-                    if(events[index].events & EPOLLOUT) {
-                        ready_events->emplace_back(std::bind(m_events[events[index].fd].get_write_cb(), EV_WRITE));
-                    }
-                    if (events[index].events & (EPOLLERR | EPOLLHUP)) {
-                        ready_events->emplace_back(std::bind(m_events[events[index].fd].get_error_cb(), EV_ERROR));
-                    }
+            for (int index = 0; index < active_events; ++index) {
+                SNOW_LOG_DEBUG << "EPOLLIN:" << EPOLLIN << " EPOLLOUT:" << EPOLLOUT << " EPOLLERR:" << EPOLLERR << " EPOLLHUP:" << EPOLLHUP;
+                SNOW_LOG_DEBUG << "epoll event:" << events[index].events;
+                if (events[index].events & EPOLLIN) {
+                    ready_events->emplace_back(std::bind(m_events[events[index].fd].get_read_cb(), EV_READ));
+                }
+                if(events[index].events & EPOLLOUT) {
+                    ready_events->emplace_back(std::bind(m_events[events[index].fd].get_write_cb(), EV_WRITE));
+                }
+                if (events[index].events & (EPOLLERR | EPOLLHUP)) {
+                    ready_events->emplace_back(std::bind(m_events[events[index].fd].get_error_cb(), EV_ERROR));
                 }
             }
         }

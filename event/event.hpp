@@ -13,11 +13,11 @@ namespace snow
 {
     enum {
         EV_NONE    = 0,
-        EV_READ    = 1,
-        EV_WRITE   = 1 << 1,
-        EV_ONESHOT = 1 << 2,
+        EV_READ    = 0x01,
+        EV_WRITE   = 0x01 << 1,
+        EV_ONESHOT = 0x01 << 2,
 
-        EV_ERROR   = 1 << 7
+        EV_ERROR   = 0x01 << 7
     };
     class event
     {
