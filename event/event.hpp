@@ -11,15 +11,22 @@
 
 namespace snow
 {
+    enum {
+        EV_NONE    = 0,
+        EV_READ    = 1,
+        EV_WRITE   = 1 << 1,
+        EV_ONESHOT = 1 << 2,
 
+        EV_ERROR   = 1 << 7
+    };
     class event
     {
     public:
         typedef std::function<void(int)> event_handle_type;
+        static const event_handle_type EMPTY_EVENT_HANDLER;
 
         event()
-          : m_mask(EV_NONE),
-            m_ready_mask(EV_NONE) {
+          : m_mask(EV_NONE) {
         }
 
         event(const event&) = delete;
@@ -50,28 +57,27 @@ namespace snow
             return m_error_cb;
         }
 
-        void set_mask(uint16_t mask) {
-            m_mask = mask;
+        void set_mark(uint16_t mark) {
+            m_mark = mark;
         }
 
-        event_mark get_mask() const {
-            return m_mask;
+        uint16_t get_mark() const {
+            return m_mark;
         }
 
         void clear() {
             m_read_cb  = EMPTY_EVENT_HANDLER;
             m_write_cb = EMPTY_EVENT_HANDLER;
             m_error_cb = EMPTY_EVENT_HANDLER;
-            m_mark.disable_all();
+            m_mark     = EV_NONE;
         }
 
 
     private:
-        static const event_handle_type EMPTY_EVENT_HANDLER;
         event_handle_type     m_read_cb;
         event_handle_type     m_write_cb;
         event_handle_type     m_error_cb;
-        event_mark            m_mark;
+        uint16_t              m_mark;
     };
 
     const event::EMPTY_EVENT_HANDLER;

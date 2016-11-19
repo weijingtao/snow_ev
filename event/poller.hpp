@@ -16,8 +16,7 @@
 #include <vector>
 #include <list>
 #include <functionnal>
-#include "socket_fd.hpp"
-#include "event.h"
+#include "event.hpp"
 #include "../logger/logger.h"
 
 namespace snow
@@ -30,13 +29,12 @@ namespace snow
 
         poller()
                 : m_epoll_fd{::epoll_create1(::EPOLL_CLOEXEC)} {
-            assert(m_epoll_fd);
+            assert(m_epoll_fd >= 0);
         }
 
-        ~poller(){
-            if(m_epoll_fd) {
+        ~poller() {
+            if(m_epoll_fd >= 0) {
                 ::close(m_epoll_fd);
-                m_epoll_fd = -1;
             }
         }
 
@@ -44,53 +42,71 @@ namespace snow
 
         poller& operator=(const poller&) = delete;
 
-        int add_event(const socket_fd& fd, const event_mark& mark, const call_back_type& cb) {
-            assert(fd && mark.empty() && cb);
-            if(fd >= MAX_FD) {
-                return;
+        int add_event(int fd, uint16_t mark, const call_back_type& cb) {
+            assert(fd >= 0 && mark != EV_NONE && cb);
+            if(fd < 0 || fd >= MAX_FD) {
+                return -1;
             }
             SNOW_LOG_DEBUG << "add socket fd " << fd << " mask " << mask;
-            auto old_mark{m_events[fd].get_mark()};
-            struct epoll_event ev_item{0};
-            if (mark.is_reading())
-                ev_item.events |= ::EPOLLIN;
-            m_events[fd]    = cb;
-            if (mark.is_writing())
-                ev_item.events |= ::EPOLLOUT;
-            m_events[fd]    = cb;
-            if (mark.is_oneshot())
-                ev_item.events |= ::EPOLLONESHOT;
-            if(old_mark == mark) {
+
+            if (mark & EV_READ) { m_events[fd].set_read_cb(cb); }
+            if (mark & EV_WRITE) { m_events[fd].get_write_cb(cb); }
+            if(mark & EV_ERROR) { m_events[fd].set_error_cb(cb); }
+
+            if(mark = m_events[fd].get_mark()) {
                 return 0;
             }
+
+            int op = m_events[fd].get_mark() == EV_NONE ? EPOLL_CTL_ADD : EPOLL_CTL_MOD;
+            m_events[fd].set_mark(m_events[fd].get_mark() | mark);
+
+            struct epoll_event ev_item{0};
             ev_item.fd = fd;
-            int op{EPOLL_CTL_ADD};
-            if(!old_mark.empty() && old_mark != mark) {
-                op = EPOLL_CTL_MOD;
-            }
+            if (m_events[fd].get_mark() & EV_READ) { ev_item.events |= ::EPOLLIN; }
+            if (m_events[fd].get_mark() & EV_WRITE) { ev_item.events |= ::EPOLLOUT; }
+            if (m_events[fd].get_mark() & EV_ONESHOT) { ev_item.events |= ::EPOLLONESHOT; }
+
             SNOW_LOG_DEBUG << "EPOLL_CTL_ADD mask " << ev_item.events;
             if (epoll_ctl(m_epoll_fd, op, fd, &ev_item) == 0) {
-                SNOW_LOG_DEBUG << "socket fd " << ev->get_socket_fd() << " add event success";
+                SNOW_LOG_DEBUG << "socket fd " << ev->get_socket_fd() << " op " << op << " event " << ev_item.events << " add event success";
                 return 0;
+            } else {
+                SNOW_LOG_ERROR << "socket fd " << ev->get_socket_fd() << " op " << op << " event " << ev_item.events << " add event fail";
+                return -2;
             }
         }
 
-        int del_event(const socket_fd& fd, const event_mark& mark) {
-            SNOW_LOG_DEBUG << "del socket fd " << ev->get_socket_fd() << " event addr " << ev;
-            if(ev->get_socket_fd() < 0) {
+        int del_event(int fd, uint16_t mark) {
+            assert(fd >= 0 && mark != EV_NONE);
+            SNOW_LOG_DEBUG << "del socket fd " << fd << " mark " << mark;
+            if(fd < 0 || fd > MAX_FD) {
                 return -1;
             }
-            if(!ev->is_none_event()) {
-                return -1;
+            if(EV_NONE == mark || EV_NONE == m_events[fd].get_mark()) {
+                return -2;
+            }
+            uint16_t new_mark = mark & ~m_events[fd].get_mark();
+            if(m_events[fd].get_mark() & EV_READ && !(new_mark & EV_NONE)) {
+                m_events[fd].set_read_cb(event::EMPTY_EVENT_HANDLER);
+            }
+            if(m_events[fd].get_mark() & EV_WRITE && !(new_mark & EV_WRITE)) {
+                m_events[fd].set_write_cb(event::EMPTY_EVENT_HANDLER);
             }
 
-            struct epoll_event ev_item;
-            std::memset(&ev_item, 0, sizeof ev_item);
-            ev_item.data.ptr = ev;
-            if (::epoll_ctl(m_epoll_fd, EPOLL_CTL_DEL, ev->get_socket_fd(), &ev_item) == 0) {
+            int op = EPOLL_CTL_MOD;
+            if(new_mark & (EV_READ | EV_WRITE)) {
+                m_events[fd].clear();
+                op = EPOLL_CTL_DEL;
+            }
+
+            struct epoll_event ev_item{0};
+            ev_item.fd = fd;
+            if (::epoll_ctl(m_epoll_fd, op, fd, &ev_item) == 0) {
+                SNOW_LOG_DEBUG << "socket fd " << ev->get_socket_fd() << " op " << op << " event " << ev_item.events << " del event success";
                 return 0;
             } else {
-                return -1;
+                SNOW_LOG_ERROR << "socket fd " << ev->get_socket_fd() << " op " << op << " event " << ev_item.events << " add event fail";
+                return -3;
             }
         }
 
@@ -124,7 +140,7 @@ namespace snow
     private:
         static const std::size_t MAX_FD = 4096;
         static std::array<event, MAX_FD> m_events;
-        socket_fd                m_epoll_fd;
+        int                              m_epoll_fd;
 
     };
 }
